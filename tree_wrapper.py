@@ -107,6 +107,9 @@ class DecisionTreeWrapper:
     def node_samples_per_class(self, node_id):
         return list(self.clf.tree_.value[node_id][0])
 
+    def node_samples(self, node_id):
+        return max(self.node_samples_per_class(node_id))
+
     def node_class(self, node_id):
         return np.argmax(self.node_samples_per_class(node_id))
 

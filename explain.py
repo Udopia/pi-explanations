@@ -72,22 +72,58 @@ class Explainer:
             eprint("Explaining category: {}".format(cat))
             leafs = wrapper.leaf_nodes(cat)
             eprint("Number of Leaf Nodes: {}".format(len(leafs)))
-            eprint("Number of prime implicants: {}".format(len(imps)))
+            eprint("Number of Prime Implicants: {}".format(len(imps)))
             cases = []
             for i, imp in enumerate(imps):
                 explanation = explainer.decode(imp)
                 cases.append(explanation["cases"])
             eprint("Leaf Depths:                 {}".format(str(sorted([ wrapper.node_depth(leaf) for leaf in leafs ]))))
             eprint("Implicant Case Distinctions: {}".format(str(sorted(cases))))
+            # leaf depths and sample numbers
+            L = []
+            for leaf in leafs:
+                depth = wrapper.node_depth(leaf)
+                samples = wrapper.node_samples_total(leaf)
+                L.append((depth, samples))
+            L.sort(key = lambda x: x[1], reverse=True)
+            # implicant size and sample numbers
+            I = []
             for i, imp in enumerate(imps):
                 explanation = explainer.decode(imp)
                 hashes = self.api.query_search(self.query + " and " + explanation["query"])
-                eprint("-" * 21)
-                eprint("Implicant {}:".format(i))
-                eprint("Number of constrained features: {}".format(explanation["features"]))
-                eprint("Number of case distinctions: {}".format(explanation["cases"]))
-                eprint("Query: {}".format(explanation["query"]))
-                eprint("Number of Samples: {}".format(len(hashes)))
+                size = explanation["features"]
+                samples = len(hashes)
+                I.append((size, samples))
+            I.sort(key = lambda x: x[1], reverse=True)
+            print("Leaf Depths and Samples: " + str(L))
+            print("Implicant Size and Samples: " + str(I))
+            if len(L) >= 18:
+                self.plot(L, I, cat)
+                #eprint("-" * 21)
+                #eprint("Implicant {}:".format(i))
+                #eprint("Number of constrained features: {}".format(explanation["features"]))
+                #eprint("Number of case distinctions: {}".format(explanation["cases"]))
+                #eprint("Query: {}".format(explanation["query"]))
+                #eprint("Number of Samples: {}".format(len(hashes)))
+
+    def plot(self, L, I, cat):
+        from matplotlib import pyplot
+        leaf_x = [ leaf[0] for leaf in L ]
+        leaf_y = [ leaf[1] for leaf in L ]
+        imp_x = [ imp[0] for imp in I ]
+        imp_y = [ imp[1] for imp in I ]
+        #n = max(max(leaf_x), max(imp_x))
+        fig, ax = pyplot.subplots()
+        ax.set_xlim([0, max(max(leaf_x), max(imp_x)) + 1])
+        ax.set_ylim([0, max(max(leaf_y), max(imp_y)) + 1])
+        ax.set_xlabel("Number of Case Distinctions")
+        ax.set_ylabel("Number of Training Samples")        
+        pyplot.title(cat.upper())
+        pyplot.scatter(leaf_x, leaf_y, marker='+', label='Leaf Nodes')
+        pyplot.scatter(imp_x, imp_y, marker='x', label='Prime Implicants')
+        pyplot.legend(loc='upper right')
+        pyplot.show()
+
 
     def train_test_accuracy_forest(self, seed=0):
         eprint("Testing ...")
@@ -119,33 +155,67 @@ class Explainer:
             for i, leafs in enumerate(leafs_list):
                 eprint("Number of Leaf Nodes for Tree {}: {}".format(i, len(leafs)))
             eprint("Number of prime implicants: {}".format(len(imps)))
+
+            I = []
+            for i, imp in enumerate(imps):
+                explanation = explainer.decode(imp)
+                hashes = self.api.query_search(self.query + " and " + explanation["query"])
+                size = explanation["features"]
+                samples = len(hashes)
+                I.append((size, samples))
+            I.sort(key = lambda x: x[1], reverse=True)
+            print("Implicant Size and Samples: " + str(I))
+            #if len(I) >= 20:
+            self.plot_forest(I, cat)
+
             cases = []
             for i, imp in enumerate(imps):
                 explanation = explainer.decode(imp)
                 cases.append(explanation["cases"])
             #eprint("Leaf Depths:                 {}".format(str(sorted([ wrapper.node_depth(leaf) for leaf in leafs ]))))
-            eprint("Implicant Case Distinctions: {}".format(str(sorted(cases))))
-            count = 0
-            for i, imp in enumerate(imps):
-                explanation = explainer.decode(imp)
-                hashes = self.api.query_search(self.query + " and " + explanation["query"])
-                if len(hashes) > 0:
-                    count = count + 1
-                    eprint("-" * 21)
-                    explanation = explainer.decode(imp)
-                    eprint("Implicant {}:".format(i))
-                    eprint("Number of constrained features: {}".format(explanation["features"]))
-                    eprint("Number of case distinctions: {}".format(explanation["cases"]))
-                    eprint("Query: {}".format(explanation["query"]))
-                    hashes = self.api.query_search(self.query + " and " + explanation["query"])
-                    eprint("Number of Samples: {}".format(len(hashes)))
-            eprint("Number of prime implicants with non-zero training instances: {}".format(count))
+            #eprint("Implicant Case Distinctions: {}".format(str(sorted(cases))))
+            #count = 0
+            #for i, imp in enumerate(imps):
+            #    explanation = explainer.decode(imp)
+            #    hashes = self.api.query_search(self.query + " and " + explanation["query"])
+            #    if len(hashes) > 0:
+            #        count = count + 1
+            #        eprint("-" * 21)
+            #        explanation = explainer.decode(imp)
+            #        eprint("Implicant {}:".format(i))
+            #        eprint("Number of constrained features: {}".format(explanation["features"]))
+            #        eprint("Number of case distinctions: {}".format(explanation["cases"]))
+            #        eprint("Query: {}".format(explanation["query"]))
+            #        hashes = self.api.query_search(self.query + " and " + explanation["query"])
+            #        eprint("Number of Samples: {}".format(len(hashes)))
+            #eprint("Number of prime implicants with non-zero training instances: {}".format(count))
+
+    def plot_forest(self, I, cat):
+        from matplotlib import pyplot
+        #leaf_x = [ leaf[0] for leaf in L ]
+        #leaf_y = [ leaf[1] for leaf in L ]
+        #imp_x = [ imp[0] for imp in I ]
+        imp_x = range(len(I))
+        imp_y = [ imp[1] for imp in I ]
+        #n = max(max(leaf_x), max(imp_x))
+        fig, ax = pyplot.subplots()
+        #ax.set_xlim([0, max(max(leaf_x), max(imp_x)) + 1])
+        #ax.set_ylim([0, max(max(leaf_y), max(imp_y)) + 1])
+        ax.set_xlim([0, max(imp_x) + 1])
+        ax.set_ylim([0, max(imp_y) + 1])
+        ax.set_xlabel("Number of Training Samples")
+        ax.set_ylabel("Prime Implicant")        
+        pyplot.title(cat.upper())
+        #pyplot.scatter(leaf_x, leaf_y, marker='+', label='Leaf Nodes')
+        pyplot.scatter(imp_x, imp_y, marker='x')
+        pyplot.legend(loc='upper right')
+        pyplot.show()
 
 
 class FamilyExplainer(Explainer):
 
     def __init__(self, api: GBD):
-        query = "track like %20% and family != unknown"
+        query = "track like %20% and family != unknown and family != agile and family unlike %random%"
         source = api.get_features("base_db") + api.get_features("gate_db")
         df = api.query_search2(query, [], source + [ "family" ], replace=[ ("timeout", np.inf), ("memout", np.inf), ("empty", np.nan), ("failed", np.inf) ])
         Explainer.__init__(self, api, df, "family", query)
