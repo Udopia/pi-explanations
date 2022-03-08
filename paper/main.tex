@@ -14,7 +14,7 @@
 \usepackage{tabu}
 \usepackage{todonotes}
 \usepackage{tabto}
-\usepackage{url}
+%\usepackage{url}
 \usepackage{hyperref}
 \usepackage{caption} 
 
@@ -55,52 +55,49 @@ We show that the explainability of machine learning methods is useful for interp
 
 Models created by inductive learning algorithms are useful in practice.
 The explainability of such automatically generated models is the subject of current research projects~\cite{Audemard:2021:Intelligibility, Darwiche:2020:Reasons}.
-In particular, for many application scenarios where accountability concerns arise, it is imperative that what is learned can be explained~\cite{Percy:2021:Accountability}. 
-%Examples include ``racist hand dryer'', tanks vs. mornings, security relevant areas like auto pilots of airplanes and cars...
+In particular, in applications for which accountability concerns arise, it is imperative that what is learned can be explained~\cite{Percy:2021:Accountability}. 
 
-Automated methods for generating explanations for machine-learned models include formalizing and encoding them in formal logic. 
-The symbolic representation of what is learned enables the application of deductive methods for reasoning about what is learned.
+Automatic generation of explanations for machine-learned models requires to formalize those models. 
+The symbolic representation of what is learned facilitates the application of deductive methods for reasoning about what is learned.
 Deductive reasoning about inductively generated models is usually referred to by the term eXplainable AI (XAI)~\cite{Arrieta:2019:XAI}. 
 
 The term \emph{explanation} is ambiguous. 
 There is a plethora of possible formalizations leading to different definitions of explainability. 
-Audemard et al. analyze the complexity of different types of XAI queries~\cite{Audemard:2020:XAI}. 
-One of the explanatory queries they analyze is prime implicants. 
+Audemard et al. analyze the complexity of different kinds of XAI queries, among which are also prime implicants~\cite{Audemard:2020:XAI}. 
+One of the explanation queries they analyze is prime implicants, which are also known as sufficient reasons~\cite{Darwiche:2020:Reasons}. 
+Choi et al. present an encoding of decision tree and random forest classifiers for computing prime implicants~\cite{Choi:2020:RF}. 
+However, they report on limitations of their approach when encoding cardinality constraints for multivalued variables. 
 
-Choi et al. present a coding of decision trees and random forests for computing prime implicants~\cite{Choi:2020:RF}. 
-They report limitations in encoding cardinality constraints for multivalued variables. 
-
-Inductive learning methods have been used in various ways to solve SAT problems more efficiently. 
-Cherif et al. successfully used reinforcement learning to control the switching of branching heuristics in their solver Kissat~MAB~\cite{Cherif:2021:KissatMAB}. 
-Clause forgetting heuristics based on classification and regression using solver runtime data were presented by Soos et al. with their system Crystal Ball~\cite{Soos:2019:CrystalBall}.
-
+Inductive learning methods have been used in various ways to solve SAT instances more efficiently. 
+Cherif et al. successfully use reinforcement learning to control the switching of branching heuristics~\cite{Cherif:2021:KissatMAB}. 
+Soos et al. present clause forgetting heuristics based on supervised learning~\cite{Soos:2019:CrystalBall}. 
 Prediction models have also been used to create algorithm selectors for portfolios of SAT solvers (cf. SATzilla~\cite{Xu:2008:SATzilla}). 
 In their approach known as instance-specific algorithm configuration (ISAC), Kadioglu et al. use unsuperived learning to create clusters in the feature space of SAT instances~\cite{Kadioglu:2010:ISAC}. 
 For each cluster, a configurator optimizes a SAT solver for the instances in that cluster. 
 
-Prediction models for algorithm selection induce, in a sense, a taxonomy for SAT instances. 
+Prediction models for algorithm selection in SAT induce, in a sense, a taxonomy for SAT instances. 
 This differs from the classes used in common practice, where instances are usually assigned to an instance family~\cite{Froleyks:2021:SC2020}. 
-The instance family may for example describe a category of SAT applications (such as \emph{hardware verification}), or refer to a specific class of instances that is of theoretical interest (such as \emph{pigeon hole}). 
+The instance family may for example describe a category of SAT applications (such as \textsf{hardware verification}), or refer to a specific class of instances that is of theoretical interest (such as \textsf{pigeon hole}). 
 
 Elffers et al. analyze SAT solver configurations for instance classes of theoretical interest~\cite{Elffers:2018:Insights}. 
-Audemard and Simon devise a taxonomy which is purely based on solver runtime parameters and deduce class specific solver configurations~\cite{Audemard:2016:Extreme}. 
+Audemard and Simon devise instance classes based on solver runtime parameters, and then they suggest class specific solver configurations~\cite{Audemard:2016:Extreme}. 
 
 Given the circumstances sketched so far, we conclude that explanations of prediction models for SAT benchmarks can provide valuable feedback to the algorithm engineer about what was learned. 
 Such explanations allow the algorithm engineer to reason about the induced instance taxonomy, and to improve their algorithm or configuration choices. 
 
-In this paper, we present a simple encoding of decision trees classifiers and random forests as a monotone combinatorial circuit. 
-We show how prime implicants can be computed for the resulting formula using an off-the-shelf incremental SAT solver. 
-Moreover, we present a tool which can encode decision tree classifiers generated with the Python package \verb!scikit-learn!~\cite{Pedregosa:2011:Scikit} into propositional formulas. 
+In this paper, we present a propositional, conjunctive normal form (CNF) encoding of decision tree classifiers and random forests. 
+The formula which we encode resembles a \emph{monotonic} combinatorial circuit, which makes it easy to compute prime implicants for it by using an off-the-shelf incremental SAT solver. 
+We present a tool which can encode decision tree and random forest classifiers generated with the Python package \verb!scikit-learn!~\cite{Pedregosa:2011:Scikit} into propositional formulas. 
 Our tool uses the SAT solver \verb!CaDiCaL!~\cite{Biere:2020:Cadical} via its \verb!IPASIR!~\cite{Balyo:2016:Ipasir} interface to generate prime implicants. 
-The prime implicants are then decoded with respect to the represented case-distinctions in the features space. 
-We evaluate the tool on a set of 26794 SAT instances, with a large set of features including their instance families. 
+All prime implicants are decoded into the minimal set of case-distinctions in the features space which they represent. 
+We evaluate our tool on classifiers for SAT instances and show that prime implicants deliver concise explanations of classifier decisions. 
 
 The document is structured as follows. 
 In Section~\ref{sec:prelim}, we present a formalization of decision tree classifiers and random forest classifiers as they are implemented in the Python package \verb!scikit-learn!. 
 The section concludes with the required fundamentals on propositional logic, incremental SAT solvers and prime implicants. 
 In Section~\ref{sec:approach}, we present a propositional encoding of the previously formalized classifiers and an algorithm to compute prime implicants for them. 
-We present our implementation in Section~\ref{sec:evaluation}, where we also evaluate our approach on a classifier which was trained to associate SAT instances families for a set of 26794 SAT instances based on a set of instance features which we also describe in that section. 
-We also evaluate our approach on a classifier which was trained to select SAT solvers from small portfolios of solvers drawn from SAT competition~2020. 
+We present our implementation in Section~\ref{sec:evaluation}, where we also evaluate our approach on a classifier which was trained to associate SAT instances to their instance family. 
+We also evaluate our approach on a classifier which was trained to select SAT solvers from small portfolios of solvers drawn from SAT Competition~2020. 
 We conclude with Section~\ref{sec:conclusion}. 
 
 
@@ -116,12 +113,12 @@ The formalizations will later serve as a fundament to the propositional encoding
 \label{sec:prelim:classification}
 
 The \emph{classification problem} under consideration is specified as follows. 
-Given a set of training samples $T \subset \mathbb{R}^n$, a set of classes $K$, and a functional ground-truth relation $G \subset T \times K$, devise a prediction function $c : \mathbb{R}^n \rightarrow K$ which maximizes the cardinality of correctly classified training samples $\bigl|\{ t \in T \mid (t, c(t)) \in G \}\bigr|$. 
+Given a set of training samples $T \subset \mathbb{R}^n$, a set of classes $K$, and a left-total ground-truth relation $G \subset T \times K$, devise a prediction function $c : \mathbb{R}^n \rightarrow K$ which maximizes the cardinality of correctly classified training samples $\bigl|\{ t \in T \mid (t, c(t)) \in G \}\bigr|$. 
 The challenge is to devise a prediction function which generalizes to yet unseen samples of the feature space. 
 In theory, decision trees can grow until they classify each training sample correctly, i.e., the classification result equals ground truth. 
 In practice however, pruning techniques such as maximum depth or minimum leaf size are used in order to improve the generalization of a classifier to yet unseen samples. 
-An introduction to methods and challenges of classification tasks and supervised learning in general can be found in Hastie et al.~\cite{Hastie:2009}. 
-The following formalization depends on the concrete implementations \verb!tree.DecisionTreeClassifier! and \verb!ensemble.RandomForestClassifier! in the Python package \verb!scikit-learn!~\cite{Pedregosa:2011:Scikit}.
+A profound introduction to methods and challenges of classification tasks and supervised learning in general can be found in Hastie et al.~\cite{Hastie:2009}. 
+The following formalization depends on the concrete implementations \verb!DecisionTreeClassifier! and \verb!RandomForestClassifier! in the Python package \verb!scikit-learn!~\cite{Pedregosa:2011:Scikit}.
 
 \subsubsection{Decision Tree Classifiers}
 \label{sec:prelim:dt}
@@ -368,8 +365,8 @@ Fortunately, only a fraction of tuples in $L$ is actually a valid combination of
 
 \newcommand{\validtuples}{\ensuremath{L'}}%
 \newcommand{\tuplev}[1]{\ensuremath{\delta(#1)}}%
-In order to determine the set of valid tuples $\validtuples \subseteq L$, we encode a small auxiliary SAT problem. 
-We use the encoding described in the previous section and \emph{validity constraints} as depicted in Figure~\ref{enc:validity}. 
+In order to determine the set of valid tuples $\validtuples \subseteq L$, we solve an \emph{auxiliary SAT instance}. 
+We use the encoding described in the previous section and add \emph{validity constraints} as depicted in Figure~\ref{enc:validity}. 
 This ensures that the tuples allow for at least one interval per feature. 
 %
 \begin{encoding}[Validity Constraints]
@@ -384,7 +381,7 @@ The constraint consists of an at-least-one clause for the leaf nodes of each tre
 We then enumerate all solutions to variables in $\{ \nodehv{v} \mid v \in \leafnodes_i, 1 \leq i \leq d \}$ with a SAT solver to generate the set of valid tuples \validtuples. 
 
 
-\paragraph{Connection Classes to Tuples}
+\paragraph{Connecting Classes to Tuples}
 
 For each valid tuple in $t_i \in \validtuples$, we introduce a new variable $\tuplev{t_i}$ and encode the \emph{tuple constraint} as depicted in Encoding~\ref{enc:tuple}. 
 %
@@ -408,8 +405,8 @@ For each tuple $t_i$, we determine its class $k_i \in K$ as shown in Equation~\r
 \subsection{Explaining Classes with Prime Implicants}
 \label{sec:approach:pi}
 
-Given a desicion tree or random forest classifier, and a set of classes to explain $X \subseteq K$, we generate the clauses according to the encoding presented in this section and add the \emph{explanation clause} $\{ \classv{k} \mid k \in X \}$. 
-In most cases, the explanation clause might be a unit clause, since we often want shortest explanations for a single class, or we might want to solve the problem repeatedly once for each class in $K$. 
+Given a desicion tree or random forest classifier, and a set of classes to explain $X \subseteq K$, we generate the clauses according to the encoding presented in this section and add the \emph{explanation clause} $\bigvee\limits_{k \in X} \classv{k}$. 
+In most cases, we are interested in shortest explanations for a single class, or we might want to solve the problem repeatedly once for each class in $K$. 
 
 \subsubsection{Minimizing Positive Inputs}
 
@@ -476,10 +473,9 @@ $(\R,\S) \leftarrow \solve(F, \emptyset)$ \;
 We can decode each minimal assignment $p \in P$ into a minimal set of case distinctions in the feature space to explain the classes $k \in X$. 
 For each feature $f$, we iterate the assignment to interval variables $\interv{f}{z_i}$ according to the ordering induced by the intervals $z_i \in \tau_f$. 
 For each adjacent pair $a=\interv{f}{z_i}$ and $b=\interv{f}{z_{i+1}}$, we decode case distinctions $D$ as follows. 
-iff $a$ is positive (negative) in $p$ while at the same time $b$ is negative (positive) in $p$. 
 If $a$ is true in $p$ and $b$ is false in $p$, we decode $D := f > z_i$. 
 If $a$ is false in $p$ and $b$ is true in $p$, we decode $D := f \leq z_i$. 
-If both $a$ and $b$ are either true or false, we decode nothing. 
+Otherwise, if both $a$ and $b$ are either true or false, we decode nothing. 
 
 
 %%%%%%%
@@ -492,28 +488,27 @@ If both $a$ and $b$ are either true or false, we decode nothing.
 
 An implementation of our approach can be found on GitHub.\footnote{\url{https://github.com/Udopia/pi-explanations}}
 It consists of a \verb!Python! module written in \verb!C++! which computes prime implicants (cf. Section~\ref{sec:approach:pi}) using the incremental SAT solver \verb!CaDiCaL! by Armin Biere~\cite{Biere:2020:Cadical}. 
-The encoding in implemented in \verb!Python! for the decision tree classifier implementation in the \verb!scikit-learn! package~\cite{Pedregosa:2011:Scikit}. 
+The encoding procedure is implemented in \verb!Python! for the \verb!DecisionTreeClassifier! and \verb!RandomForestClassifier! implementations in the \verb!scikit-learn! package~\cite{Pedregosa:2011:Scikit}. 
 
 
 \subsubsection{Dataset}
 \label{sec:eval:data}
 
 Our implementation accesses data via our \verb!gbd-tools! package\footnote{\url{https://pypi.org/project/gbd-tools/}} which we orginially presented in~\cite{Iser:2018:GDB}. 
-The three datasets which we used in our evaluations can be obtained at \url{https://gbd.iti.kit.edu/} and are described in the following. 
+The three datasets which we use in our evaluations can be obtained at \url{https://gbd.iti.kit.edu/} and are described in the following. 
 The code which we used to calculate the features described in Sections~\ref{sec:data:base} and~\ref{sec:data:gate} can be found on GitHub.\footnote{\url{https://github.com/sat-clique/cnftools}}
 
 
 \paragraph{Meta Features}
 
-We collected a set of meta features in a huge database of more than 26k benchmark instances (mainly from SAT competitions since 2002). 
-These meta fetures include the sat/unsat result (if known) and the instance family. 
-The instance families have been manually deduced from the documents in SAT competition proceedings or SAT competition presentation slides. 
+We collected a set of \emph{meta features} in a database of more than 26k benchmark instances taken mainly from SAT Competitions since 2002~\cite{Froleyks:2021:SC2020}. 
+These meta features include the family of an instance as it can be deduced from the benchmark description documents in the Proceedings of the respective SAT Competition. 
 
 
 \paragraph{Base Features}
 \label{sec:data:base}
 
-The features in the \emph{base} dataset do not resemble but share some noteworthy coverage with the features used in~\cite{Xu:2008:SATzilla} and~\cite{Alfonso:2014:Features}. 
+The features in the \emph{base dataset} do not resemble but share some noteworthy coverage with the features used in~\cite{Xu:2008:SATzilla} and~\cite{Alfonso:2014:Features}. 
 
 \subparagraph{Amounts}
 
@@ -540,7 +535,7 @@ Degree distributions by \textsf{mean}, \textsf{variance}, \textsf{minimum}, \tex
 \paragraph{Gate Features}
 \label{sec:data:gate}
 
-The features in the \emph{gate} gate dataset were calculated for a recovered hierarchical gate structure which was generated by a gate extraction algorithm for cnf formulas~\cite{Iser:2015:Gates,Iser:2020:Disse}. 
+The features in the \emph{gate dataset} were calculated for a recovered hierarchical gate structure which was generated by a gate extraction algorithm for cnf formulas~\cite{Iser:2015:Gates,Iser:2020:Disse}. 
 
 \subparagraph{Amounts}
 
@@ -580,11 +575,10 @@ That left us with a total 6647 instances of 124 distinct instance families.
 We train a decision tree classifier to predict the family of an instance given the instance features described in Sections~\ref{sec:data:base} and~\ref{sec:data:gate}. 
 The accuracy of the classifier in a cross-validation experiment leaving out 20\% of the instances as a testing set is around $94\%$. 
 
-Figure~\ref{fig:eval:families} depicts the explanation for four exemplary families in terms of the leaf nodes (blue) and the prime implicants (orange). 
+Figure~\ref{fig:eval:families} depicts the explanation sizes for four exemplary families in terms of the leaf nodes (blue) and the prime implicants (orange). 
 The x-axis shows the number of case distinctions, which corresponds to the node depths in terms of the leaf nodes and the number of decoded case distinctions in case of the prime implicants. 
 The y-axis shows the number of training samples selected by the respective case distinctions. 
-The figure shows that with prime implicants we generally need less case distinctions to explain a classification result. 
-The figure also shows that prime implicants generally cover more samples than singular leaf nodes. 
+Using prime implicants we need less case distinctions to explain a classification result, while at the same time covering more samples than with leaf nodes. 
 
 
 \subsubsection{Small Portfolios Classifier} 
@@ -635,10 +629,10 @@ In this scenario, we have a total of 66792 leaf node combinations, of which only
 \section{Conclusion}
 \label{sec:conclusion}
 
-Our evaluation shows that with prime implicants we indeed need less case distinctions while at the same time covering more samples for explaining classification results. 
+Our evaluation shows that with prime implicants, we indeed need less case distinctions while at the same time covering more samples for explaining classification results. 
 Calculating prime implicants has the advantage that we can extract useful information such as the smallest prime implicant covering most of the samples. 
-This can for example be used to only calculate a small subset of the features to use only a small set of case distinction for selecting solver configurations. 
-Moreover, specific prime implicants can become subject to research, e.g., to reason about the imposed taxonomy or for evaluating biases in benchmarks. 
+This can for example be used to only calculate a small subset of the features for \emph{selecting solver configurations}. 
+Moreover, specific prime implicants can become subject to further research questions, e.g., to reason about the \emph{imposed taxonomy} or for evaluating \emph{biases in benchmarks}. 
 
 One problem for our approach is the growing number of interval thresholds in random forests. 
 In initial experiments with the random forest encoding, we see a large number of prime implicants which is not represented by a sample in the training set, i.e, we discover a large number of valid leaf tuples in the random forest which is actually empty (in terms of training samples) but would still produce a classification result for yet unseen samples matching the imposed case distinctions. 
