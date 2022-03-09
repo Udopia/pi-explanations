@@ -42,7 +42,7 @@ class DecisionTreeWrapper:
                 thre = self.node_threshold(node)
                 self.feature_splits[feat].append(thre)
         for values in self.feature_splits:
-            values = sorted(set(values))
+            values.sort()
 
     def leaf_nodes(self, class_name):
         nodes = []

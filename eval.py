@@ -31,10 +31,10 @@ def main():
     with GBD(databases, jobs=8) as api:
         #ex = FamilyExplainer(api)
         ex = PortfolioExplainer(api, [ "kissat_unsat", "relaxed_newtech" ])
-        #ex.train_test_accuracy()
-        #ex.explain()
-        ex.train_test_accuracy_forest()
-        ex.explain_forest()
+        ex.train_test_accuracy()
+        ex.explain()
+        #ex.train_test_accuracy_forest()
+        #ex.explain_forest()
 
 if __name__ == '__main__':
     main()

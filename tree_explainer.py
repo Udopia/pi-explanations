@@ -16,8 +16,6 @@
 
 import numpy as np
 
-from pysat.solvers import Glucose4 as Solver
-
 from tree_wrapper import DecisionTreeWrapper
 
 from solbert import compute_prime_implicants
@@ -150,7 +148,7 @@ class DecisionTreeExplainer:
     def encode_value_constraints(self):
         clauses = []
         for node in range(self.dtw.n_nodes()):
-            if self.dtw.is_inner_node(node): 
+            if self.dtw.is_inner_node(node):
                 feat = self.dtw.node_feature(node)
                 thre = self.dtw.node_threshold(node)
                 split = 1+self.dtw.feature_values(feat).index(thre)
