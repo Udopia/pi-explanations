@@ -97,8 +97,8 @@ class Explainer:
             I.sort(key = lambda x: x[1], reverse=True)
             print("Leaf Depths and Samples: " + str(L))
             print("Implicant Size and Samples: " + str(I))
-            if len(L) >= 18:
-                self.plot(L, I, cat)
+            #if len(L) >= 18:
+            self.plot(L, I, cat)
                 #eprint("-" * 21)
                 #eprint("Implicant {}:".format(i))
                 #eprint("Number of constrained features: {}".format(explanation["features"]))
