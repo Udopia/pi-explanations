@@ -1,0 +1,98 @@
+\documentclass[t]{beamer}
+%\documentclass[c]{beamer}
+\listfiles
+
+\definecolor{oblue}{HTML}{3f6f8c}
+\definecolor{ogray}{HTML}{c0bcb5}
+\definecolor{oviolet}{HTML}{59c9a5}%{56e39f}
+\definecolor{opuce}{HTML}{af5d63}
+\definecolor{ored}{HTML}{ed474a}
+\colorlet{mblue}{oblue!50}
+\colorlet{mgray}{ogray!50}
+\colorlet{mviolet}{oviolet!50}
+\colorlet{mpuce}{opuce!50}
+\colorlet{mred}{ored!50}
+
+\mode<presentation> {
+  \usetheme[english,titlepage0,20pt]{KIT}
+  \usefonttheme{structurebold}
+  \setbeamercovered{transparent}
+  \setbeamertemplate{enumerate items}[ball]
+  \setbeamercolor{block title}{bg=mblue,fg=black}
+  \setbeamercolor{block title example}{bg=mviolet,fg=black}
+  \setbeamercolor{block title alerted}{bg=mpuce,fg=black}
+  \setbeamertemplate{blocks}[rounded][shadow=true]
+  \setbeamertemplate{itemize item}{\color{ogray}\textbullet}
+  \setbeamertemplate{itemize subitem}{\color{ogray}\textbullet}
+  \setbeamertemplate{enumerate item}[square]
+  \setbeamercolor{item projected}{bg=oblue,fg=mgray}
+}
+
+\usepackage{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[TS1,T1]{fontenc}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{smartdiagram}
+\usepackage[normalem]{ulem}
+\usepackage{tabularx}
+\usepackage{tabulary}
+\usepackage{colortbl}
+\usepackage{multirow}
+
+\newcommand{\h}[1]{{\color{opuce}{#1}}}
+
+\title{Explaining Classifiers with Prime Implicants}
+\subtitle{Markus Iser}
+\author{Markus Iser}
+\institute{KIT-Institute of Theoretical Informatics -- Algorithm Engineering}
+
+\TitleImage[width=\titleimagewd]{scratch}
+
+\newlength{\tmplen}
+
+\newcommand{\verysmall}{\fontsize{6pt}{8.6pt}\selectfont}
+
+\begin{document}
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+
+\begin{frame}{eXplainable Artificial Intelligence (XAI)}
+\begin{itemize}
+\item Learning: Generate inductive models from training samples\\
+\item Explaining: Deductive reasoning about about model
+\end{itemize}
+\begin{block}{Explaination Queries}
+\begin{itemize}
+\item Minimum Cardinality
+\item \textbf{Prime Implicant}
+\item Counterfactual
+\end{itemize}
+\end{block}
+\begin{block}{Verification Queries}
+\begin{itemize}
+\item Closeness of Classes
+\item (Anti-) Monotone Features
+\item Irrelevant, Mandatory or Forbidden Features
+\item \dots
+\end{itemize}
+\end{block}
+\footnotesize{Audemard et al. - On Tractable XAI Queries based on Compiled Representations, KR 2020}
+\end{frame}
+
+
+\begin{frame}{Generate Prime Implicants \dots }
+
+\dots for Scikit-Learn \textsf{DecisionTreeClassifier} and \textsf{RandomForestClassifier}
+
+\begin{block}{Prime Implicants}
+\url{https://github.com/Udopia/pi-explanations}
+\end{block}
+\end{frame}
+
+
+\end{document}
+
