@@ -556,15 +556,24 @@ For the \verb!RandomForestClassifier! we additionally reduced the number of deci
 \subsubsection{Instance Family Classifier}
 
 \begin{figure}
+\centering
+\includegraphics[width=.9\linewidth]{fig2/ncd-ratio-vs-family-size.pdf}
+\caption{NCD Ratio denotes the fraction of average numbers of case distinctions in prime implicants divided by the average number of case distinctions by leaf nodes. The NCD ratios of all classes are scattered over the number of samples in each class (Family Size)}
+\label{fig:ncdr-vs-size}
+\end{figure}
+
+\begin{figure}
 \begin{minipage}{.49\linewidth}
-\includegraphics[width=\linewidth]{fig/fam_bitvector_leafs18_imps16.pdf}\\
-\includegraphics[width=\linewidth]{fig/fam_hv_leafs24_imps24.pdf}
+\includegraphics[width=\linewidth]{fig2/dc-crypto.pdf}\\
+\includegraphics[width=\linewidth]{fig2/dc-planning.pdf}
 \end{minipage}
 \begin{minipage}{.49\linewidth}
-\includegraphics[width=\linewidth]{fig/fam_crypto_leafs24_imps20.pdf}\\
-\includegraphics[width=\linewidth]{fig/fam_miter_leafs23_imps23.pdf}
+\includegraphics[width=\linewidth]{fig2/dc-hardwareverification.pdf}\\
+\includegraphics[width=\linewidth]{fig2/dc-graphcoloring.pdf}
 \end{minipage}
-\caption{Number of Case Distinctions in Feature Space and Number of Covered Training Samples for \emph{Prime Implicants} (orange) vs. \emph{Leaf Nodes} (blue). The classifier was trained to separate instances by their family. The plots show the explanations for the four exemplary families \emph{bitvector},  \emph{cryptography}, \emph{hardware-verification} and \emph{miter}.}
+\caption{NCD denotes the absolute number of case distinctions in prime implicants (Implicants) and leaf nodes (Leafs). 
+The classifier was trained to separate instances by their family. 
+The plots depict the distributions of these values for the four largest classes \emph{cryptography},  \emph{hardeware-verification}, \emph{planning} and \emph{graph-coloring}.}
 \label{fig:eval:families}
 \end{figure}
 
@@ -585,12 +594,12 @@ Using prime implicants we need less case distinctions to explain a classificatio
 
 \begin{figure}
 \begin{minipage}{.49\linewidth}
-\includegraphics[width=\linewidth]{fig/kissat_unsat_leafs22_imps13.pdf}
+\includegraphics[width=\linewidth]{fig2/dc2-kissat-unsat.pdf}
 \end{minipage}
 \begin{minipage}{.49\linewidth}
-\includegraphics[width=\linewidth]{fig/relaxed_newtech_leafs20_imps15.pdf}
+\includegraphics[width=\linewidth]{fig2/dc2-relaxed-newtech.pdf}
 \end{minipage}
-\caption{Number of Case Distinctions in Feature Space and Number of Covered Training Samples for \emph{Prime Implicants} (orange) vs. \emph{Leaf Nodes} (blue). The classifier was trained to separate instances for \emph{Kissat Unsat} from instances for \emph{Relaxed NewTech} (by solver speed).}
+\caption{Number of Case Distinctions (NCD) and Number of Covered Training Samples (Cov.) for \emph{Prime Implicants} (Implicants) vs. \emph{Leaf Nodes} (Leafs). The classifier was trained to separate instances for \emph{Kissat Unsat} from instances for \emph{Relaxed NewTech} (by solver speed).}
 \label{fig:eval:portfolio}
 \end{figure}
 
@@ -603,10 +612,10 @@ Figure~\ref{fig:eval:portfolio} shows that also in this case, with prime implica
 
 \begin{figure}
 \begin{minipage}{.49\linewidth}
-\includegraphics[width=\linewidth]{fig/random-forest-2-kissat-unsat.pdf}
+\includegraphics[width=\linewidth]{fig2/random-forest-2-kissat-unsat.pdf}
 \end{minipage}
 \begin{minipage}{.49\linewidth}
-\includegraphics[width=\linewidth]{fig/random-forest-2-relaxed-newtech.pdf}
+\includegraphics[width=\linewidth]{fig2/random-forest-2-relaxed-newtech.pdf}
 \end{minipage}
 \caption{Number of Covered Training Samples for all \emph{Prime Implicants}. The classifier was trained to separate instances for \emph{Kissat Unsat} from instances for \emph{Relaxed NewTech} (by solver speed).}
 \label{fig:eval:portfolio-rf}
@@ -617,13 +626,17 @@ For this classifer, the accuracy in a cross-validation experiment leaving out 20
 Figure~\ref{fig:eval:portfolio-rf} shows the number of training samples for each prime implicant of the two classes. 
 We observe a large number of prime implicants with zero training samples. 
 This is due to ``spurious'' valid tuples of leaf nodes emerging in the random forest. 
-The total number of leaf node combinations in this forest is 1518. 
-The number of valid tuples determined by our encoding algorithm is 125 (cf. Section~\ref{sec:valid-tuples}). 
+The total number of leaf node combinations in this forest is $1518$. 
+The number of valid tuples determined by our encoding algorithm is $1312$ (cf. Section~\ref{sec:valid-tuples}). 
+The \textsf{Kissat unsat} class encompasses a total of $1088$ prime implicants. 
+The \textsf{Relaxed newTech} class encompasses a total of $224$ prime implicants. 
+$92$ of those prime implicants encompass training samples of which only $40$ cover more than $1$ training sample. 
 
 We also train a random forest classifier consisting of only 3 decision trees for the same data. 
 For this classifer, the accuracy in a cross-validation experiment leaving out 20\% of the instances as a testing set raises to around $78\%$. 
-In this scenario, we have a total of 66792 leaf node combinations, of which only 11082 are valid, i.e., they are reachable by some combination of values in the feature space (cf. Section~\ref{sec:valid-tuples}). 
-
+In this scenario, we have a total of $66792$ leaf node combinations, of which $48880$ are valid combinations, i.e., they are reachable by some combination of values in the feature space (cf. Section~\ref{sec:valid-tuples}). 
+The \textsf{Kissat unsat} class encompasses a total of $27807$ prime implicants of which only $104$ prime implicants encompass training samples and only $37$ of the prime implicants encompass more than one training sample. 
+The \textsf{Relaxed newTech} class encompasses a total of $21073$ prime implicants of which only $81$ prime implicants encompass training samples and only $31$ of the prime implicants encompass more than one training sample. 
 
 %%%%%%%
 \section{Conclusion}

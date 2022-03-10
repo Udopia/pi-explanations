@@ -67,7 +67,11 @@ class Explainer:
             implicants[cat] = explainer.explain([cat])
             implicants[cat].sort(key=len)
 
+        Ls = []
+        Is = []
+        cats = []
         for cat, imps in implicants.items():
+            cats.append(cat)
             eprint("-" * 42)
             eprint("Explaining category: {}".format(cat))
             leafs = wrapper.leaf_nodes(cat)
@@ -86,6 +90,7 @@ class Explainer:
                 samples = wrapper.node_samples_total(leaf)
                 L.append((depth, samples))
             L.sort(key = lambda x: x[1], reverse=True)
+            Ls.append(L)
             # implicant size and sample numbers
             I = []
             for i, imp in enumerate(imps):
@@ -95,10 +100,12 @@ class Explainer:
                 samples = len(hashes)
                 I.append((size, samples))
             I.sort(key = lambda x: x[1], reverse=True)
+            Is.append(I)
             print("Leaf Depths and Samples: " + str(L))
             print("Implicant Size and Samples: " + str(I))
+            #samples_total = len(self.api.query_search(self.query))
             #if len(L) >= 18:
-            self.plot(L, I, cat)
+        self.plot(Ls, Is, cats)
                 #eprint("-" * 21)
                 #eprint("Implicant {}:".format(i))
                 #eprint("Number of constrained features: {}".format(explanation["features"]))
@@ -106,29 +113,49 @@ class Explainer:
                 #eprint("Query: {}".format(explanation["query"]))
                 #eprint("Number of Samples: {}".format(len(hashes)))
 
-    def plot(self, L, I, cat):
-        from matplotlib import pyplot
-        leaf_x = [ leaf[0] for leaf in L ]
-        leaf_y = [ leaf[1] for leaf in L ]
-        imp_x = [ imp[0] for imp in I ]
-        imp_y = [ imp[1] for imp in I ]
-        #n = max(max(leaf_x), max(imp_x))
-        fig, ax = pyplot.subplots()
-        ax.set_xlim([0, max(max(leaf_x), max(imp_x)) + 1])
-        ax.set_ylim([0, max(max(leaf_y), max(imp_y)) + 1])
-        ax.set_xlabel("Number of Case Distinctions")
-        ax.set_ylabel("Number of Training Samples")        
-        pyplot.title(cat.upper())
-        pyplot.scatter(leaf_x, leaf_y, marker='+', label='Leaf Nodes')
-        pyplot.scatter(imp_x, imp_y, marker='x', label='Prime Implicants')
-        pyplot.legend(loc='upper right')
-        pyplot.show()
+    def plot(self, Ls, Is, cats):
+        from matplotlib import pyplot as plt
+        from statistics import mean
+        sizes = []
+        ncd_ratios = []
+        for i in range(len(cats)):
+            L = Ls[i]
+            I = Is[i]
+            ncd_leafs = [ leaf[0] for leaf in L ]
+            cov_leafs = [ leaf[1] for leaf in L ]
+            ncd_imps = [ imp[0] for imp in I ]
+            sizes.append(sum(cov_leafs))
+            ncd_ratios.append(mean(ncd_imps) / mean(ncd_leafs))
+        fig, ax = plt.subplots()
+        ax.set_xlabel("Family Size (Number of Samples)")
+        ax.set_ylabel("NCD Ratio")
+        plt.title("NCD Ratio vs. Family Size")
+        plt.scatter(sizes, ncd_ratios, marker='x')
+        plt.legend(loc='upper right')
+        plt.show()
+
+        for i in range(len(cats)):
+            L = Ls[i]
+            I = Is[i]
+            cat = cats[i]
+            ncd_leafs = [ leaf[0] for leaf in L ]
+            cov_leafs = [ leaf[1] for leaf in L ]
+            ncd_imps = [ imp[0] for imp in I ]
+            cov_imps = [ imp[1] for imp in I ]
+            if sizes[i] > 0:#350:
+                K = ["NCD (Leafs)", "NCD (Implicants)"]#, "Cov. (Leafs)", "Cov. (Implicants)"], pd.Series(cov_leafs), pd.Series(cov_imps)
+                df = pd.concat([pd.Series(ncd_leafs), pd.Series(ncd_imps)], keys=K, ignore_index=True, axis=1)
+                print(df)
+                plt.title("Family: {}, NCD Ratio: {:2f}".format(cat.upper(), mean(ncd_imps) / mean(ncd_leafs)))
+                plt.boxplot(df)
+                plt.xticks(range(1, len(K)+1), K)
+                plt.show()
 
 
     def train_test_accuracy_forest(self, seed=0):
         eprint("Testing ...")
         xtrain, xtest, ytrain, ytest = train_test_split(self.x, self.y, test_size=0.2, random_state=seed)
-        model = ensemble.RandomForestClassifier(random_state=seed, n_estimators=3)
+        model = ensemble.RandomForestClassifier(random_state=seed, n_estimators=2)
         model.fit(xtrain, ytrain)
         ypred=model.predict(xtest)
         acc = accuracy_score(ytest, ypred)
@@ -136,7 +163,7 @@ class Explainer:
 
     def explain_forest(self, seed=0):
         eprint("Training ...")
-        model = ensemble.RandomForestClassifier(random_state=seed, n_estimators=3)
+        model = ensemble.RandomForestClassifier(random_state=seed, n_estimators=2)
         model.fit(self.x, self.y)
         wrapper = RandomForestWrapper(model, self.lhs, self.rhs)
         explainer = RandomForestExplainer(wrapper)
@@ -203,8 +230,8 @@ class Explainer:
         #ax.set_ylim([0, max(max(leaf_y), max(imp_y)) + 1])
         ax.set_xlim([0, max(imp_x) + 1])
         ax.set_ylim([0, max(imp_y) + 1])
-        ax.set_xlabel("Number of Training Samples")
-        ax.set_ylabel("Prime Implicant")        
+        ax.set_ylabel("Number of Covered Training Samples")
+        ax.set_xlabel("Prime Implicant")        
         pyplot.title(cat.upper())
         #pyplot.scatter(leaf_x, leaf_y, marker='+', label='Leaf Nodes')
         pyplot.scatter(imp_x, imp_y, marker='x')
