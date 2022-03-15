@@ -18,7 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from gbd_tool.gbd_api import GBD
+from sklearn import tree, ensemble
 from explain import FamilyExplainer, PortfolioExplainer
+
+def get_decision_tree():
+    seed = 0
+    return tree.DecisionTreeClassifier(random_state=seed)
+
+def get_random_forest():
+    seed = 0
+    trees = 2
+    return ensemble.RandomForestClassifier(random_state=seed, n_estimators=trees)
 
 def main():
     databases = [
@@ -29,12 +39,13 @@ def main():
     ]
 
     with GBD(databases, jobs=8) as api:
-        #ex = FamilyExplainer(api)
-        ex = PortfolioExplainer(api, [ "kissat_unsat", "relaxed_newtech" ])
+        #ex = FamilyExplainer(get_decision_tree, api)
+        ex = PortfolioExplainer(get_decision_tree, api, [ "kissat_unsat", "relaxed_newtech" ])
         ex.train_test_accuracy()
         ex.explain()
-        #ex.train_test_accuracy_forest()
-        #ex.explain_forest()
+        ex = PortfolioExplainer(get_random_forest, api, [ "kissat_unsat", "relaxed_newtech" ])
+        ex.train_test_accuracy()
+        ex.explain()
 
 if __name__ == '__main__':
     main()
