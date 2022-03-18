@@ -15,13 +15,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import itertools as it
+import multiprocessing
 
 from forest_wrapper import RandomForestWrapper
 from tree_encoder import VariableProducer
 
 from solbert import compute_prime_implicants
 from solbert import enumerate_models
+from solbert import model_iterator
 
 class RandomForestEncoder:
 
@@ -50,7 +51,18 @@ class RandomForestEncoder:
             self.vdeactivateright.append([ self.new_var() for _ in self.rfw.feature_values(feat_id) ])
         # base encoding
         self.clauses = self.encode()
-        self.comb = self.enumerate_valid_combinations()
+        total_comb = 1
+        for tree in self.rfw.trees:
+            total_comb = total_comb * tree.n_leafs()
+        print("Total Combinations: {}".format(total_comb))
+        print("Computing Valid Combinations ...")
+        self.comb = [ [ ] for _ in range(self.rfw.n_classes()) ] 
+        self.enumerate_valid_combinations()
+        print("Valid Combinations: {}".format(sum(len(valid_combs) for valid_combs in self.comb)))
+        self.pool = multiprocessing.Pool(processes=4)
+
+    def __del__(self):
+        self.pool.terminate()
 
 
     def new_var(self):
@@ -81,18 +93,38 @@ class RandomForestEncoder:
         assert False, "variable {} not found".format(var_id)
 
 
-    def explain(self, targetclasses):       
+    def explain(self):
+        implicants = dict()
+        for cat in range(self.rfw.n_classes()):
+            target = self.encode_target_class(cat)
+            implicants[cat] = compute_prime_implicants(self.clauses + target, self.vintervall)
+            implicants[cat].sort(key=len)
+        return implicants
+
+
+    def explain_parallel(self):
+        results = list()
+        for class_id in range(self.rfw.n_classes()):
+            target = self.encode_target_class(class_id)
+            res = self.pool.apply_async(compute_prime_implicants, (self.clauses + target, self.vintervall))
+            results.append(res)
+        implicants = dict()
+        for class_id in range(self.rfw.n_classes()):
+            cat = self.rfw.class_name(class_id)
+            implicants[cat] = results[class_id].get()
+            implicants[cat].sort(key=len)
+        return implicants
+
+
+    def encode_target_class(self, class_id):
         root_clause = []
         term_clauses = []
-        for class_name in targetclasses:
-            class_id = self.rfw.class_id(class_name)
-            for term in self.comb[class_id]:
-                enc = self.new_var()
-                root_clause.append(enc)
-                for lit in term:
-                    term_clauses.append([ -enc, lit ])
-
-        return compute_prime_implicants(self.clauses + term_clauses + [ root_clause ], self.vintervall)
+        for term in self.comb[class_id]:
+            enc = self.new_var()
+            root_clause.append(enc)
+            for lit in term:
+                term_clauses.append([ -enc, lit ])
+        return term_clauses + [ root_clause ]
 
 
     def decode(self, implicant):
@@ -169,53 +201,48 @@ class RandomForestEncoder:
         return clauses
 
 
-    def enumerate_valid_combinations(self):
-        print("Computing Valid Combinations ...")
-        total_comb = 1
-        for tree in self.rfw.trees:
-            total_comb = total_comb * tree.n_leafs()
-        print("Total Combinations: {}".format(total_comb))
-        combcons = self.encode_combination_constraints()
-        #print(combcons)
-        clauses = self.clauses + combcons
-        minim = []
+    def get_class(self, comb):
+        probs = [ 0, ] * self.rfw.n_classes()
+        for v in comb:
+            tree_id = self.var2tree(v, True)
+            node_id = self.var2node(tree_id, v, True)
+            samples_total = self.rfw.node_samples_total(tree_id, node_id)
+            samples_per_class = self.rfw.node_samples_per_class(tree_id, node_id)
+            for class_id in range(self.rfw.n_classes()):
+                proba = samples_per_class[class_id] / samples_total
+                probs[class_id] = probs[class_id] + proba
+        return np.argmax(probs)
+
+
+    def get_leaf_vars(self):
+        leafs = []
         for tree_id in range(self.rfw.n_trees()):
             for node_id in range(self.rfw.n_nodes(tree_id)):
                 if not self.rfw.is_inner_node(tree_id, node_id):
-                    minim.append(self.node2var(tree_id, node_id, True))
-        #print(minim)
-        valid_comb = enumerate_models(clauses, minim)
-        #print(valid_comb)
-        print("Valid Combinations: {}".format(len(valid_comb)))
-        class_comb = [ [ ] for _ in range(self.rfw.n_classes()) ]
-        for comb in valid_comb:
-            probs = [ 0, ] * self.rfw.n_classes()
-            for v in comb:
-                tree_id = self.var2tree(v, True)
-                node_id = self.var2node(tree_id, v, True)
-                samples_total = self.rfw.node_samples_total(tree_id, node_id)
-                samples_per_class = self.rfw.node_samples_per_class(tree_id, node_id)
-                for class_id in range(self.rfw.n_classes()):
-                    proba = samples_per_class[class_id] / samples_total
-                    probs[class_id] = probs[class_id] + proba
-            class_id = np.argmax(probs)
-            class_comb[class_id].append(comb)
-        return class_comb
+                    leafs.append(self.node2var(tree_id, node_id, True))
+        return leafs
+
+
+    def enumerate_valid_combinations(self):
+        clauses = self.clauses + self.encode_combination_constraints()
+        project = self.get_leaf_vars()
+        for comb in model_iterator(clauses, project):
+            class_id = self.get_class(comb)
+            self.comb[class_id].append(comb)
+
 
     def encode_combination_constraints(self):
         clauses = []
+        # at least one leaf per tree:
         for tree_id in range(self.rfw.n_trees()):
-            clause = []  # at least one leaf
+            clause = []
             for node_id in range(self.rfw.n_nodes(tree_id)):
                 if not self.rfw.is_inner_node(tree_id, node_id):
                     clause.append(self.node2var(tree_id, node_id, True))
-            #print("Leafs Tree {}: {}".format(tree_id, str(clause)))
             clauses.append(clause)
-            for comb in it.combinations(clause, 2):  # at most one leaf
-                clauses.append([ -comb[0], -comb[1] ])
+        # at least one value per feature:
         for feat_id in range(self.rfw.n_features()):
-            clause = [ -v for v in self.vintervals[feat_id] ]  # at least one value
-            #print("Feature {}: {}".format(feat_id, str(clause)))
+            clause = [ -v for v in self.vintervals[feat_id] ]
             clauses.append(clause)
         return clauses
 

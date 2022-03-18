@@ -21,14 +21,18 @@ from gbd_tool.gbd_api import GBD
 from sklearn import tree, ensemble
 from explain import FamilyExplainer, PortfolioExplainer
 
-def get_decision_tree():
-    seed = 0
-    return tree.DecisionTreeClassifier(random_state=seed)
 
-def get_random_forest():
-    seed = 0
-    trees = 2
-    return ensemble.RandomForestClassifier(random_state=seed, n_estimators=trees)
+def explain_portfolio(model_getter, api: GBD):
+    ex = PortfolioExplainer(model_getter, api, [ "kissat_unsat", "relaxed_newtech" ])
+    ex.train_test_accuracy()
+    ex.explain()
+
+
+def explain_family(model_getter, api: GBD):
+    ex = FamilyExplainer(model_getter, api)
+    ex.train_test_accuracy()
+    ex.explain()
+
 
 def main():
     databases = [
@@ -39,13 +43,14 @@ def main():
     ]
 
     with GBD(databases, jobs=8) as api:
-        #ex = FamilyExplainer(get_decision_tree, api)
-        ex = PortfolioExplainer(get_decision_tree, api, [ "kissat_unsat", "relaxed_newtech" ])
-        ex.train_test_accuracy()
-        ex.explain()
-        ex = PortfolioExplainer(get_random_forest, api, [ "kissat_unsat", "relaxed_newtech" ])
-        ex.train_test_accuracy()
-        ex.explain()
+        seed = 0
+        trees = 3
+        get_decision_tree = lambda : tree.DecisionTreeClassifier(random_state=seed)
+        get_random_forest = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=trees)
+        #explain_portfolio(get_decision_tree, api)
+        explain_portfolio(get_random_forest, api)
+        #explain_family(get_decision_tree, api)
+        #explain_family(get_random_forest, api)
 
 if __name__ == '__main__':
     main()

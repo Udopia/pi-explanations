@@ -60,4 +60,24 @@ static void pylist(PyObject* list, PyObject* val) {
     PyList_Append(list, val);
 }
 
+
+static std::vector<int> list_to_vec(PyObject* list) {
+    std::vector<int> vec;
+    for (Py_ssize_t i = 0; i < PyList_Size(list); i++) {
+        PyObject* elem = PyList_GetItem(list, i);
+        long lit = PyLong_AsLong(elem);
+        vec.push_back(static_cast<int>(lit));
+    }
+    return vec;
+}
+
+static std::vector<std::vector<int>> list_to_formula(PyObject* list) {
+    std::vector<std::vector<int>> formula;
+    for (Py_ssize_t i = 0; i < PyList_Size(list); i++) {
+        PyObject* elem = PyList_GetItem(list, i);
+        formula.push_back(list_to_vec(elem));
+    }
+    return formula;
+}
+
 #endif  // SRC_UTIL_PY_UTIL_H_

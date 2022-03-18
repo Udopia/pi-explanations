@@ -38,11 +38,7 @@ class DecisionTreeExplainer:
         self.wrapper = wrapper
         self.encoder = DecisionTreeEncoder(wrapper)
         self.cats = self.wrapper.class_names
-        self.implicants = dict()
-        for cat in self.cats:
-            eprint("Calculating prime implicants for category {}".format(str(cat)))
-            self.implicants[cat] = self.encoder.explain([cat])
-            self.implicants[cat].sort(key=len)
+        self.implicants = self.encoder.explain()
 
 
     def print_implicants(self):
