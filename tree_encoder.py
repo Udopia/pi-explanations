@@ -79,10 +79,18 @@ class DecisionTreeEncoder:
         assert False, "variable {} not found".format(var_id)
 
 
-    def explain(self, targetclasses):
-        targetclause = [ self.class2var(self.dtw.class_id(name)) for name in targetclasses ]
+    def explain(self):
+        implicants = dict()
+        for cat in self.dtw.class_names:
+            target = self.encode_target_classes([cat])
+            implicants[cat] = compute_prime_implicants(self.clauses + target, self.vintervall)
+            implicants[cat].sort(key=len)
+        return implicants
 
-        return compute_prime_implicants(self.clauses + [ targetclause ], self.vintervall)
+
+    def encode_target_classes(self, targetclasses):
+        target = [ self.class2var(self.dtw.class_id(name)) for name in targetclasses ]
+        return [ target ]
 
 
     def decode(self, implicant):

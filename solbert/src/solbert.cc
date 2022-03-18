@@ -26,25 +26,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "src/apps/PrimeImplicants.h"
 #include "src/apps/EnumerateModels.h"
 
+#include "src/apps/ModelIterator.h"
 
-static std::vector<int> list_to_vec(PyObject* list) {
-    std::vector<int> vec;
-    for (Py_ssize_t i = 0; i < PyList_Size(list); i++) {
-        PyObject* elem = PyList_GetItem(list, i);
-        long lit = PyLong_AsLong(elem);
-        vec.push_back(static_cast<int>(lit));
-    }
-    return vec;
-}
 
-static std::vector<std::vector<int>> list_to_formula(PyObject* list) {
-    std::vector<std::vector<int>> formula;
-    for (Py_ssize_t i = 0; i < PyList_Size(list); i++) {
-        PyObject* elem = PyList_GetItem(list, i);
-        formula.push_back(list_to_vec(elem));
-    }
-    return formula;
-}
 
 static PyObject* compute_prime_implicants(PyObject* self, PyObject* arg) {
     PyObject* pyformula;
@@ -112,9 +96,15 @@ static PyMethodDef methods[] = {
 };
 
 static struct PyModuleDef solbert = {
-    PyModuleDef_HEAD_INIT, "solbert", "Python Wrapper for Incremental Applications of the CaDiCaL SAT Solver", -1, methods
+    PyModuleDef_HEAD_INIT, 
+    "solbert", "Python Wrapper for Incremental SAT Applications", -1, methods
 };
 
 PyMODINIT_FUNC PyInit_solbert(void) {
-    return PyModule_Create(&solbert);
+    PyObject* mod = PyModule_Create(&solbert);
+
+    Py_INCREF((PyObject*) &ModelIteratorType);
+    PyModule_AddObject(mod, "model_iterator", (PyObject*) &ModelIteratorType);
+
+    return mod;
 }

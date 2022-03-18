@@ -17,11 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
-import pandas as pd
-from sklearn import tree, ensemble
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
+import time
 
 from gbd_tool.gbd_api import GBD
 from gbd_tool.util import eprint
@@ -38,38 +34,36 @@ class RandomForestExplainer:
         self.wrapper = wrapper
         self.encoder = RandomForestEncoder(wrapper)
         self.cats = self.wrapper.class_names
-        self.implicants = dict()
-        for cat in self.cats:
-            eprint("Calculating prime implicants for category {}".format(str(cat)))
-            self.implicants[cat] = self.encoder.explain([cat])
-            self.implicants[cat].sort(key=len)
+        start = time.time()
+        self.implicants = self.encoder.explain_parallel()
+        end = time.time()
+        eprint("Seconds to explain: {}".format(round(end - start)))
 
 
     def print_implicants(self):
-        cat_leafs = []
-        cat_imps = []
+        #cat_leafs = []
+        #cat_imps = []
         for cat in self.cats:
-            (leafs, imps) = self.explain(cat)
-            cat_leafs.append(leafs)
-            cat_imps.append(imps)
-        self.plot(cat_leafs, cat_imps)
+            eprint("-" * 42)
+            eprint("Explaining category: {}".format(cat))
+            #(leafs, imps) = self.explain(cat)
+            #cat_leafs.append(leafs)
+            #cat_imps.append(imps)
+            eprint("Number of prime implicants: {}".format(len(self.implicants[cat])))
+        #self.plot(cat_leafs, cat_imps)
 
 
     def explain(self, cat):
         imps = self.implicants[cat]
-        eprint("-" * 42)
-        eprint("Explaining category: {}".format(cat))
-        eprint("Number of prime implicants: {}".format(len(imps)))
-
         I = []
-        for i, imp in enumerate(imps):
+        for imp in imps:
             explanation = self.encoder.decode(imp)
             hashes = self.api.query_search(self.query + " and " + explanation["query"])
             size = explanation["features"]
             samples = len(hashes)
             I.append((size, samples))
         I.sort(key = lambda x: x[1], reverse=True)        
-        print("Implicant Size and Samples: " + str(I))
+        print("Class {} Implicant Size and Samples: {}".format(cat, str(I)))
         return ([], I)
 
 
