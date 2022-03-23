@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/CMakeFiles/Cadical"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/CMakeFiles/Cadical.rule"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/CMakeFiles/Cadical-complete.rule"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/cadical/src/Cadical-stamp/Cadical-build.rule"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/cadical/src/Cadical-stamp/Cadical-configure.rule"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/cadical/src/Cadical-stamp/Cadical-download.rule"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/cadical/src/Cadical-stamp/Cadical-install.rule"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/cadical/src/Cadical-stamp/Cadical-mkdir.rule"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/cadical/src/Cadical-stamp/Cadical-patch.rule"
+		},
+		{
+			"file" : "/home/iser/git/pi-explanations/solbert/cadical/src/Cadical-stamp/Cadical-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"Cadical"
+		],
+		"name" : "Cadical"
+	}
+}
