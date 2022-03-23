@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/solbert.dir/src/Main.cc.o -o solbert  cadical/src/Cadical/build/libcadical.a 

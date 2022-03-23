@@ -1,5 +1,5 @@
 /*************************************************************************************************
-Solbert -- Copyright (c) 2022, Markus Iser, KIT - Karlsruhe Institute of Technology
+CNFTools -- Copyright (c) 2021, Markus Iser, KIT - Karlsruhe Institute of Technology
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -73,20 +73,21 @@ struct ResourceLimitsNotSupported : public std::exception {
     }
 };
 
-
+struct rlimit cpu_limit;
 static void timeout(int signal) {
+    setrlimit(RLIMIT_CPU, &cpu_limit);
     throw TimeLimitExceeded();
 }
 
-#ifndef _WIN32
 struct rlimit as_limit;
 static void memout() {
     setrlimit(RLIMIT_AS, &as_limit);
     throw MemoryLimitExceeded();
 }
-#endif
 
+struct rlimit fsize_limit;
 static void fileout(int signal) {
+    setrlimit(RLIMIT_FSIZE, &fsize_limit);
     throw FileSizeLimitExceeded();
 }
 
@@ -173,6 +174,8 @@ class ResourceLimits {
                 std::cerr << "Warning: Runtime limit could not be set" << std::endl;
             }
 
+            cpu_limit = limit;
+            cpu_limit.rlim_cur = limit.rlim_max;
             signal(SIGXCPU, timeout);
         }
 
@@ -189,6 +192,8 @@ class ResourceLimits {
                 std::cerr << "Warning: File size limit could not be set" << std::endl;
             }
 
+            fsize_limit = limit;
+            fsize_limit.rlim_cur = limit.rlim_max;
             signal(SIGXFSZ, fileout);
         }
 

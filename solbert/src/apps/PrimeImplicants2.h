@@ -23,20 +23,11 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 #include "lib/ipasir.h"
 
-#ifndef SRC_APPS_PRIMEIMPLICANTS_H_
-#define SRC_APPS_PRIMEIMPLICANTS_H_
+#ifndef SRC_APPS_PRIMEIMPLICANTS2_H_
+#define SRC_APPS_PRIMEIMPLICANTS2_H_
 
-/**
- * @brief Get prime implicants 
- * formula must resemble a monotonic function of inputs
- * inputs must be pure and positive in formula
- * 
- * @param formula 
- * @param inputs 
- * @return std::vector<std::vector<int>> 
- */
-std::vector<std::vector<int>> get_prime_implicants(std::vector<std::vector<int>> formula, std::vector<int> inputs) {
-    // initialize solver
+std::vector<std::vector<int>> get_prime_implicants2(std::vector<std::vector<int>> formula, std::vector<int> inputs) {
+    // initialize enumerating solver
     void* S = ipasir_init();
     for (std::vector<int>& clause : formula) {
         for (int lit : clause) {
@@ -48,12 +39,24 @@ std::vector<std::vector<int>> get_prime_implicants(std::vector<std::vector<int>>
     std::vector<std::vector<int>> prime_implicants;
 
     bool result = (ipasir_solve(S) == 10);
-    while (result) { // determine models
-        while (result) { // minimize model
+    while (result) {
+        // initialize minimizing solver
+        void* S2 = ipasir_init();
+        for (std::vector<int>& clause : formula) {
+            for (int lit : clause) {
+                if (ipasir_val(S, lit) >= 0) {
+                    ipasir_add(S2, abs(lit));
+                }
+            }
+            ipasir_add(S2, 0);
+        }
+        // minimize model
+        result = (ipasir_solve(S2) == 10);
+        while (result) {
             std::vector<int> minim;
             std::vector<int> facts;
             for (int var : inputs) {
-                if (ipasir_val(S, var) >= 0) {
+                if (ipasir_val(S2, var) >= 0) {
                     minim.push_back(-var);
                 } else {
                     facts.push_back(-var);
@@ -61,20 +64,34 @@ std::vector<std::vector<int>> get_prime_implicants(std::vector<std::vector<int>>
             }
 
             for (int lit : minim) {
-                ipasir_add(S, lit);
+                ipasir_add(S2, lit);
             }
-            ipasir_add(S, 0);
+            ipasir_add(S2, 0);
 
             for (int lit : facts) {
-                ipasir_assume(S, lit);
+                ipasir_add(S2, lit);
+                ipasir_add(S2, 0);
             }
 
-            result = (ipasir_solve(S) == 10);
+            result = (ipasir_solve(S2) == 10);
             if (!result) {
-                // std::cout << "Found Prime Implicant: ";
-                // for (int lit : minim) std::cout << lit << " ";
-                // std::cout << std::endl;
-                prime_implicants.push_back(minim);
+                ipasir_release(S2);
+                std::vector<int> prim;
+                for (int lit : minim) {
+                    if (ipasir_val(S, lit) >= 0) {
+                        prim.push_back(lit);
+                    } else {
+                        prim.push_back(-lit);
+                    }
+                }
+                prime_implicants.push_back(prim);
+
+                for (int lit : prim) {
+                    //std::cout << lit << " ";
+                    ipasir_add(S, -lit);
+                }
+                //std::cout << std::endl;
+                ipasir_add(S, 0);
             }
         }
         result = (ipasir_solve(S) == 10);
@@ -85,4 +102,4 @@ std::vector<std::vector<int>> get_prime_implicants(std::vector<std::vector<int>>
     return prime_implicants;
 }
 
-#endif  // SRC_APPS_PRIMEIMPLICANTS_H_
+#endif  // SRC_APPS_PRIMEIMPLICANTS2_H_

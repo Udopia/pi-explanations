@@ -27,6 +27,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "src/apps/EnumerateModels.h"
 
 #include "src/apps/ModelIterator.h"
+#include "src/apps/PrimeImplicants2.h"
 
 
 
@@ -58,6 +59,38 @@ static PyObject* compute_prime_implicants(PyObject* self, PyObject* arg) {
         return pytype("memout");
     }
 }
+
+
+static PyObject* compute_prime_implicants2(PyObject* self, PyObject* arg) {
+    PyObject* pyformula;
+    PyObject* pyinputs;
+    unsigned rlim = 0, mlim = 0;
+    PyArg_ParseTuple(arg, "OO|II", &pyformula, &pyinputs, &rlim, &mlim);
+
+    ResourceLimits limits(rlim, mlim);
+    limits.set_rlimits();
+    try {
+        // compute prime implicants guarded
+        std::vector<std::vector<int>> formula = list_to_formula(pyformula);
+        std::vector<int> inputs = list_to_vec(pyinputs);
+        
+        std::vector<std::vector<int>> pis = get_prime_implicants2(formula, inputs);
+        PyObject* obj = pylist();
+        for (std::vector<int>& pi : pis) {
+            PyObject* obj2 = pylist();
+            for (int lit : pi) {
+                pylist(obj2, lit);
+            }
+            pylist(obj, obj2);
+        }
+        return obj;
+    } catch (TimeLimitExceeded& e) {
+        return pytype("timeout");
+    } catch (MemoryLimitExceeded& e) {
+        return pytype("memout");
+    }
+}
+
 
 static PyObject* enumerate_models(PyObject* self, PyObject* arg) {
     PyObject* pyformula;
@@ -91,6 +124,7 @@ static PyObject* enumerate_models(PyObject* self, PyObject* arg) {
 
 static PyMethodDef methods[] = {
     {"compute_prime_implicants", compute_prime_implicants, METH_VARARGS, "Compute Prime Implicants"},
+    {"compute_prime_implicants2", compute_prime_implicants2, METH_VARARGS, "Compute Prime Implicants"},
     {"enumerate_models", enumerate_models, METH_VARARGS, "Enumerate Models"},
     {nullptr, nullptr, 0, nullptr}
 };

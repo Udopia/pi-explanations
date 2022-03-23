@@ -1,6 +1,7 @@
 # ignore this too
 .vscode/
 .main.tex.swp
+CMakeFiles/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
