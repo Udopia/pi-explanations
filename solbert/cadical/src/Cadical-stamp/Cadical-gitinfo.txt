@@ -1,3 +1,0 @@
-repository='https://github.com/arminbiere/cadical'
-module=''
-tag='origin'
