@@ -2,8 +2,10 @@
 .vscode/
 .main.tex.swp
 CMakeFiles/
+uninstall.info
+cadical/
 
-# cmake
+# cmake template:
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
