@@ -63,11 +63,11 @@ class Explainer:
         if isinstance(model, tree.DecisionTreeClassifier):
             wrapper = DecisionTreeWrapper(model, self.lhs, self.rhs)
             explainer = DecisionTreeExplainer(self.query, self.api, wrapper)
-            explainer.print_implicants()
+            explainer.report()
         elif isinstance(model, ensemble.RandomForestClassifier):
             wrapper = RandomForestWrapper(model, self.lhs, self.rhs)
             explainer = RandomForestExplainer(self.query, self.api, wrapper)
-            explainer.print_implicants()
+            explainer.report()
         else:
             eprint("Cannot explain models of type {}".format(type(model)))
 
@@ -76,7 +76,7 @@ class FamilyExplainer(Explainer):
 
     def __init__(self, model_getter, api: GBD):
         query = "track like %20% and family != unknown and family != agile and family unlike %random%"
-        source = api.get_features("base_db") + api.get_features("gate_db")
+        source = api.get_features("base_db") # + api.get_features("gate_db")
         df = api.query_search2(query, [], source + [ "family" ], replace=[ ("timeout", np.inf), ("memout", np.inf), ("empty", np.nan), ("failed", np.inf) ])
         Explainer.__init__(self, model_getter, api, df, "family", query)
 
@@ -86,7 +86,7 @@ class PortfolioExplainer(Explainer):
     def __init__(self, model_getter, api: GBD, solvers):
         notout = " or ".join([ "({s} != timeout and {s} != memout)".format(s=solver) for solver in solvers ])
         query = "track = main_2020 and ({})".format(notout)
-        source = api.get_features("base_db") + api.get_features("gate_db")
+        source = api.get_features("base_db") # + api.get_features("gate_db")
         df = api.query_search2(query, [], source + solvers, replace=[ ("timeout", np.inf), ("memout", np.inf), ("empty", np.nan), ("failed", np.inf) ])
         df["solver"] = "empty"
         for s in solvers:

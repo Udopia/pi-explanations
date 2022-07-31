@@ -44,13 +44,14 @@ def main():
 
     with GBD(databases, jobs=8) as api:
         seed = 0
-        trees = 3
         get_decision_tree = lambda : tree.DecisionTreeClassifier(random_state=seed)
-        get_random_forest = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=trees)
+        get_random_forest2 = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=2)
+        get_random_forest3 = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=3)
         #explain_portfolio(get_decision_tree, api)
-        explain_portfolio(get_random_forest, api)
-        #explain_family(get_decision_tree, api)
-        #explain_family(get_random_forest, api)
+        #explain_portfolio(get_random_forest2, api)
+        #explain_portfolio(get_random_forest3, api)
+        explain_family(get_decision_tree, api)
+        explain_family(get_random_forest2, api)
 
 if __name__ == '__main__':
     main()
