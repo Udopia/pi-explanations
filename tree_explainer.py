@@ -29,6 +29,8 @@ from gbd_tool.util import eprint
 from tree_encoder import DecisionTreeEncoder
 from tree_wrapper import DecisionTreeWrapper
 
+from matplotlib import pyplot as plt
+
 
 class DecisionTreeExplainer:
 
@@ -39,54 +41,60 @@ class DecisionTreeExplainer:
         self.encoder = DecisionTreeEncoder(wrapper)
         self.cats = self.wrapper.class_names
         self.implicants = self.encoder.explain()
-
-
-    def print_implicants(self):
-        cat_leafs = []
-        cat_imps = []
+        self.nleafs = dict() # category -> n leafs
+        self.nprime = dict() # category -> n prime implicants
+        self.depths = dict() # category -> [depths]
+        self.nsplits = dict() # category -> [nsplits by prime implicants]
+        self.nsamples_leafs = dict() # category -> [samples per leaf]
+        self.queries = dict() # category -> queries from prime implicants
+        self.nsamples_prime = dict() # category -> [samples per prime implicant]
         for cat in self.cats:
-            (leafs, imps) = self.explain(cat)
-            cat_leafs.append(leafs)
-            cat_imps.append(imps)
-        self.plot(cat_leafs, cat_imps)
+            eprint("Explaining category: {}".format(cat))
+            leafs = self.wrapper.leaf_nodes(cat)
+            implicants = self.implicants[cat]
+            self.nleafs[cat] = len(leafs)
+            self.nprime[cat] = len(implicants)
+            self.depths[cat] = sorted([ self.wrapper.node_depth(leaf) for leaf in leafs ])
+            self.nsplits[cat] = sorted([self.encoder.decode(imp)["cases"] for imp in implicants])
+            self.nsamples_leafs[cat] = sorted([self.wrapper.node_samples_total(leaf) for leaf in leafs])
+            self.queries[cat] = [ self.encoder.decode(imp)["query"] for imp in implicants ]
+            self.nsamples_prime[cat] = sorted([len(self.api.query_search(self.query + " and " + query)) for query in self.queries[cat]])
 
+    def report(self):
+        self.report_depth_vs_size()
+        #self.report_numbers_of_samples()
+        self.report_queries()
 
-    def explain(self, cat):
-        imps = self.implicants[cat]
-        eprint("-" * 42)
-        eprint("Explaining category: {}".format(cat))
-        leafs = self.wrapper.leaf_nodes(cat)
-        eprint("Number of Leaf Nodes: {}".format(len(leafs)))
-        eprint("Number of Prime Implicants: {}".format(len(imps)))
-        cases = []
-        for i, imp in enumerate(imps):
-            explanation = self.encoder.decode(imp)
-            cases.append(explanation["cases"])
-        eprint("Leaf Depths:                 {}".format(str(sorted([ self.wrapper.node_depth(leaf) for leaf in leafs ]))))
-        eprint("Implicant Case Distinctions: {}".format(str(sorted(cases))))
-        # leaf depths and sample numbers
-        L = []
-        for leaf in leafs:
-            depth = self.wrapper.node_depth(leaf)
-            samples = self.wrapper.node_samples_total(leaf)
-            L.append((depth, samples))
-        L.sort(key = lambda x: x[1], reverse=True)
-        # implicant size and sample numbers
-        I = []
-        for i, imp in enumerate(imps):
-            explanation = self.encoder.decode(imp)
-            hashes = self.api.query_search(self.query + " and " + explanation["query"])
-            size = explanation["features"]
-            samples = len(hashes)
-            I.append((size, samples))
-        I.sort(key = lambda x: x[1], reverse=True)
-        print("Leaf Depths and Samples: " + str(L))
-        print("Implicant Size and Samples: " + str(I))
-        return (L, I)
+    def report_depth_vs_size(self):
+        fig, ax = plt.subplots()
+        ax.set_xlabel("Leaf or PI")
+        ax.set_ylabel("Leaf Depth / PI Size")
+        for cat in self.cats:
+            plt.title(cat)
+            plt.plot(self.depths[cat], label="Leaf Depths")
+            plt.plot(self.nsplits[cat], label="PI Splits")
+            plt.legend()
+            plt.show()
+
+    def report_numbers_of_samples(self):
+        fig, ax = plt.subplots()
+        ax.set_xlabel("Leaf or PI")
+        ax.set_ylabel("Numbers of Samples")
+        for cat in self.cats:
+            plt.title(cat)
+            plt.plot(self.nsamples_leafs[cat])
+            plt.plot(self.nsamples_prime[cat])
+            plt.legend(loc="upper left")
+            plt.show()
+
+    def report_queries(self):
+        for cat in self.cats:
+            print("PI Queries for", cat)
+            print("\n".join(self.queries[cat]))
+
 
 
     def plot(self, leaf_data, imp_data):
-        from matplotlib import pyplot as plt
         from statistics import mean
         sizes = []
         ncd_ratios = []

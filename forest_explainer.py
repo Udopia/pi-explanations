@@ -25,6 +25,8 @@ from gbd_tool.util import eprint
 from forest_encoder import RandomForestEncoder
 from forest_wrapper import RandomForestWrapper
 
+from matplotlib import pyplot as plt
+
 
 class RandomForestExplainer:
 
@@ -38,33 +40,47 @@ class RandomForestExplainer:
         self.implicants = self.encoder.explain_parallel()
         end = time.time()
         eprint("Seconds to explain: {}".format(round(end - start)))
-
-
-    def print_implicants(self):
-        #cat_leafs = []
-        #cat_imps = []
+        self.nprime = dict() # category -> n prime implicants
+        self.nsamples = dict() # cat -> [nsamples per prime implicant]
+        self.pi_sizes = dict() # cat -> [sizes of prime implicants]
         for cat in self.cats:
-            eprint("-" * 42)
-            eprint("Explaining category: {}".format(cat))
-            #(leafs, imps) = self.explain(cat)
-            #cat_leafs.append(leafs)
-            #cat_imps.append(imps)
-            eprint("Number of prime implicants: {}".format(len(self.implicants[cat])))
-        #self.plot(cat_leafs, cat_imps)
+            self.nsamples[cat] = []
+            self.pi_sizes[cat] = []
+            self.nprime[cat] = len(self.implicants[cat])
+            for imp in self.implicants[cat]:
+                explanation = self.encoder.decode(imp)
+                size = explanation["features"]
+                samples = len(self.api.query_search(self.query + " and " + explanation["query"]))
+                self.nsamples[cat].append(samples)
+                self.pi_sizes[cat].append(size)
+            self.nsamples[cat].sort(reverse=True)
+            self.pi_sizes[cat].sort()
 
 
-    def explain(self, cat):
-        imps = self.implicants[cat]
-        I = []
-        for imp in imps:
-            explanation = self.encoder.decode(imp)
-            hashes = self.api.query_search(self.query + " and " + explanation["query"])
-            size = explanation["features"]
-            samples = len(hashes)
-            I.append((size, samples))
-        I.sort(key = lambda x: x[1], reverse=True)        
-        print("Class {} Implicant Size and Samples: {}".format(cat, str(I)))
-        return ([], I)
+    def report(self):
+        self.report_pi_sizes()
+        self.report_numbers_of_samples()
+
+    def report_pi_sizes(self):
+        fig, ax = plt.subplots()
+        ax.set_xlabel("Prime Implicant")
+        ax.set_ylabel("Numbers of Case Distinctions")
+        plt.title("Sizes of Prime Implicants")
+        for cat in self.cats:
+            plt.plot(self.pi_sizes[cat], label=cat)
+        plt.legend(loc="upper left")
+        plt.show()
+
+    def report_numbers_of_samples(self):
+        fig, ax = plt.subplots()
+        ax.set_xlabel("Prime Implicant")
+        ax.set_ylabel("Numbers of Samples")
+        ax.set_xscale('log')
+        plt.title("Number of Samples per Prime Implicant")
+        for cat in self.cats:
+            plt.plot(self.nsamples[cat], label=cat)
+        plt.legend(loc="upper left")
+        plt.show()
 
 
     def plot(self, leaf_data, imp_data):
