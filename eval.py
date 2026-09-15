@@ -49,9 +49,9 @@ def main():
         get_random_forest3 = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=3)
         #explain_portfolio(get_decision_tree, api)
         #explain_portfolio(get_random_forest2, api)
-        #explain_portfolio(get_random_forest3, api)
-        explain_family(get_decision_tree, api)
-        explain_family(get_random_forest2, api)
+        explain_portfolio(get_random_forest3, api)
+        #explain_family(get_decision_tree, api)
+        #explain_family(get_random_forest2, api)
 
 if __name__ == '__main__':
     main()

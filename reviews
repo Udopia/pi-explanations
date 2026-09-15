@@ -1,0 +1,130 @@
+
+
+Dear Markus, 
+
+We are pleased to inform you that your paper titled 
+
+Calculating Sufficient Reasons for Random Forest Classifiers 
+
+has been accepted for presentation at the PoS 2022 workshop. 
+The reviews are appended to this email and we ask that you take them 
+into account while preparing the presentation of your work.
+
+A preliminary program will be available shortly on the workshop web page.
+
+Thanks again for your contribution to the PoS workshop. We are looking 
+forward to attending the presentation of your work. 
+
+Best regards, 
+
+Matti Järvisalo and Daniel Le Berre
+
+SUBMISSION: 8
+TITLE: Calculating Sufficient Reasons for Random Forest Classifiers
+
+
+----------------------- REVIEW 1 ---------------------
+SUBMISSION: 8
+TITLE: Calculating Sufficient Reasons for Random Forest Classifiers
+AUTHORS: Markus Iser
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+The paper investigates the use of a SAT solver to explain predictions from random forests (boosted trees/tree ensembles).
+
+The paper reads well and it will be an interesting contribution to the workshop. The author should consult a recent publication on related topic [1] (accepted to AAAI22 with only a preprint available; disclaimer: I'm not the author). Their results seem to be scaling better than the presented paper, even though this paper is not trying to enumerate all prime implications, which eventually is bound to blow up.
+
+The author should try to spell out early what kind of explanations are to be shown. Prime implications on what kind of variables? Ideally there would be a small example.
+
+Comments
+--------
+
+The set of classes K should be finite.
+
+Presumably all the encoding is using a 1-hot representation?
+
+I'm confused about what beta does.  The text says that is a single variable but I would expect that the formula needs to decide whether there is a (labeled) edge n->m for any n<m.
+
+I'm unclear on the concept of "explanation clause".  Why is it separate from the rest of the encoding? Why do we need this term?
+
+I'm having trouble understanding Algorithm 1. Let F={x or y}, with model x=y=1, minim is set to {-x,-y}, F union minim is unsat, so P is now {x, y}, which isn't right. It seems that there are some double curly braces missing somewhere but I'm not sure if that's enough to fix it.
+
+My understanding is that Alg1 should be a standard monotone predicate minimization (e.g. [2]), the author should refer which existing algorithm he's using. 
+
+Minor
+-----
+
+"devise a prediction function which generalizes to yet unseen..."  which -> that
+
+The symbol f seems to be used in multiple roles, which is confusing.
+
+"As thresholds are chosen independently the size"  insert comma after "independently".
+
+"Recapitulate how classification works in the random forests described in" I would assume this sentence is not supposed to be in the imperative mode.
+
+References
+----------
+[1] Using MaxSAT for Efficient Explanations of Tree Ensembles. Available at https://alexeyignatiev.github.io/publications/
+[2] J. Marques-Silva, M. Janota, A. Belov: Minimal Sets over Monotone Predicates in Boolean Formulae. CAV 2013
+
+
+
+----------------------- REVIEW 2 ---------------------
+SUBMISSION: 8
+TITLE: Calculating Sufficient Reasons for Random Forest Classifiers
+AUTHORS: Markus Iser
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+Summary:
+
+This (work in progress) paper introduces a propositional encoding for decision tree and random forest classifiers that resembles monotonic combinatorial circuits and thereby mitigates prime implicant computations. The prime implicants of the resulting SAT formula can be used to explain the predictions made by the classifier. Beyond the encoding steps, the paper shows how to find the prime implicants efficiently and then how to map them back to the feature space of the classification problem. The encoding is evaluated on classifiers trained on features of SAT Competition problem instances.
+
+Using prime implicants of SAT problems to explain decisions of machine learning systems is an intriguing topic and fits perfectly into the scope of POS. The encoding proposed here has the advantage to produce formulas where all prime implicants can be computed by considering only certain assignments of a narrow subset of the variables. Scaling the proposed encoding to larger random forests is an open problem yet, but the main ideas of the paper and the preliminary results are very interesting to see. I would recommend to accept this submission.
+
+Comments:
+
+- In the current form the encoding description is very dense. Illustrating the notation and the encoding on a small decision tree would make it much easier to follow the details. Also, I would recommend to separate the notations of the decision tree and the encoding (e.g. V is used for the set of nodes and for the set of variables at the same time, f is the feature index function and a feature at the same time). In general, a little bit more context and details about the challenges of the encoding would make it easier to appreciate the value of the paper (e.g. we need an encoding where the SAT prime implicants actually explain the encoded classifier and where calculating the prime implicants is cheap, etc.).
+
+Minor remarks & typos:
+- The running title and the actual title of the paper are different (A Positive Monotonic Circuit Encoding for Random Forest Classifiers vs. Calculating Sufficient Reasons for Random Forest Classifiers)
+- p5:"and into two auxiliary sets": remove and
+- p6: Figure 3.7 -> Encoding 3.7
+- p8, p10, p12: Sections 4.1.1 and 4.1.1: wrong section numbers
+- p9: It is a really bad format to describe the feature sets. Maybe use enumerations here to separate the base and gate features in a more visible way?
+- p10 has Figure 1, but it is never referenced or mentioned in the paper
+- p10 " in terms of the leaf nodes (blue) and the prime implicants (orange)" - there nothing blue on Fig.2
+- p11: NCD is introduced in Fig. 3 but it was used already in Fig. 2
+
+
+
+----------------------- REVIEW 3 ---------------------
+SUBMISSION: 8
+TITLE: Calculating Sufficient Reasons for Random Forest Classifiers
+AUTHORS: Markus Iser
+
+----------- Overall evaluation -----------
+SCORE: 0 (borderline paper)
+----- TEXT:
+The article describes a decision tree CNF encoding with a new method for incremental enumeration of prime implicants. Preliminary results show that they can classify CNF instances with an accuracy of 94% into their benchmark family and choose the better SAT solver in 2 solver comparision with an accuracy of 78%.
+
+While these results seem to be quite convincing it is not clear what the baseline is in terms of other approaches. What are other works in CNF classification, what is their approach. It would be great to compare the benchmark family classification with an approach not using the prime implicants. 
+
+It seems difficult for me to differentiate what is "new" in this paper. In my understanding Section 2 describes a previous work already implemented in scikit-learn [17]. Section 3 has to be the own work - but this is not clear. Section 3 is a description a propositional encoding of the prviously formalized classifiers and ... - does this mean previously in section two or from another source - which source then?? For Section 4 it is clear again as they present their implementation! - but the implementation of cnftools seems to be a previous work?! Please clarify!
+
+In your conclusion you write that you need "less case distinctions while at the same time covering more samples for explaining classification results". Figure 3 should show this result - these differences seems to be very small. 
+
+In 4.2.2 you describe 3 approaches - is the first one your new approach with 68% accuracy? Or are all three approaches tested using prime implicants? What is then the difference to not using the implicants in terms of accuracy? This needs to be clarified upon publication.
+
+Minor:
+- in 3.2.2 -- previous section is not clear - does it mean the main section 2, subsection 3.1 or subsubsection 3.2.1??
+- same sentence: depicted in Figure 3.7 -- as there is no Figure 3.7 --> Encoding 3.7
+- Encoding 3.7 enumerate all solutions with a SAT solver -- for time critical solutions this can be done with a special enumeration solver. Especially as it is a auxiliary SAT instance
+- 4.1.1 -- ...Sections 4.1.1 and 4.1.1 can be found on GitHub
+- 4.2.1 -- Sections 4.1.1 and 4.1.1 again
+- Figure 2 -- hard"e"ware
+
+
+

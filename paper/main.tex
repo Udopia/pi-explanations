@@ -28,25 +28,18 @@
 \newtheorem{encoding}{Encoding}[section]
 
 
-\title{Explaining SAT Benchmark Classifiers with Prime~Implicants}
+\title{Calculating Sufficient Reasons for Random Forest Classifiers}
 \author{Markus Iser}{Karlsruhe Institute of Technology (KIT), Institute of Theoretical Informatics, Algorithm Engineering, Germany \and \url{https://algo2.iti.kit.edu/english/3986.php}}{markus.iser@kit.edu}{https://orcid.org/0000-0003-2904-232X}{}
 \Copyright{Markus Iser}
 \authorrunning{M. Iser}
 \ccsdesc{Theory of computation~Logic and verification}
 \ccsdesc{Computing methodologies~Supervised learning by classification}
-\keywords{Benchmarks, Explainable Algorithm Selection, Prime Implicants}
+\keywords{Explainable Artificial Intelligence (XAI), Explainable Algorithm Selection, Sufficient Reasons, Prime Implicants}
 
 \begin{document}
 \maketitle
 \begin{abstract}
-Taxonomies for benchmark instances can be derived in several ways. For example, this can be based on their theoretical properties, or it can be based on their origin, e.g., a concrete application. 
-Some algorithm selectors even generate instance classes based on a set of features in an unsupervised manner. 
-We see a gap in the explainability of such approaches. 
-In this paper, we present a SAT encoding for decision tree and random forest classifiers that we can use to generate prime implicants. 
-We then apply this encoding to generate minimal explanations for two types of classifiers. 
-The first type of classifier was trained to map SAT instances to their instance family.
-The second type of classifier was trained as an instance-specific SAT solver selector on a small portfolio.
-We show that the explainability of machine learning methods is useful for interpreting experiments as it provides valuable feedback to the algorithm developer.
+In this paper, we formalize the implementations of decision tree and random forest classifiers of the Python Scikit-learn package, and we present a CNF encoding which can be used to calculate sufficient reasons a.k.a. prime implicants for them. Our decision tree encoding resembles a monotonic combinational circuit with pure input variables, of which we take advantage in our method for incremental enumeration of its prime implicants. Encoding the combination of several decision trees in a random forest would add a non-monotonic evaluation function to the root of the encoded circuit. In our approach, we solve an auxiliary SAT instance for enumerating valid leaf-node combinations of the random forest. Each valid leaf-node combination is used to incrementally update the original monotonic circuit encoding by extending its root-level disjunction with a new term. Preliminary results show that enumeration of prime implicants by incrementally updating the encoding is by order of magnitudes faster than one-shot solving of the monolithic formula. We present preliminary runtime data, and some initial data about the sizes and numbers of samples found when translating the prime implicants back into database queries.
 \end{abstract}
 
 
@@ -113,7 +106,7 @@ The formalizations will later serve as a fundament to the propositional encoding
 \label{sec:prelim:classification}
 
 The \emph{classification problem} under consideration is specified as follows. 
-Given a set of training samples $T \subset \mathbb{R}^n$, a set of classes $K$, and a left-total ground-truth relation $G \subset T \times K$, devise a prediction function $c : \mathbb{R}^n \rightarrow K$ which maximizes the cardinality of correctly classified training samples $\bigl|\{ t \in T \mid (t, c(t)) \in G \}\bigr|$. 
+Given a finite set of training samples $T \subset \mathbb{R}^n$, a finite set of classes $K$, and a left-total ground-truth relation $G \subset T \times K$, devise a prediction function $c : \mathbb{R}^n \rightarrow K$ which maximizes the cardinality of correctly classified training samples $\bigl|\{ t \in T \mid (t, c(t)) \in G \}\bigr|$. 
 The challenge is to devise a prediction function which generalizes to yet unseen samples of the feature space. 
 In theory, decision trees can grow until they classify each training sample correctly, i.e., the classification result equals ground truth. 
 In practice however, pruning techniques such as maximum depth or minimum leaf size are used in order to improve the generalization of a classifier to yet unseen samples. 
@@ -411,13 +404,14 @@ In most cases, we are interested in shortest explanations for a single class, or
 \subsubsection{Minimizing Positive Inputs}
 
 The presented encodings of decision trees and random forests resemble a monotonic combinatorial circuit. 
-Thus, a minimal assignment to the input variables induces a minimal assignment to all the variables in the circuit. 
-The circuit is rooted in the explanation clause, and the inputs of the circuit are the interval variables. 
-In fact the clauses encode mostly binary implication chains. 
-All implied variables are implied in their positive polarity. 
-For this reason, we can compute prime implicants by minimizing the number of positively assigned interval variables. 
+Thus, a minimal assignment to the input variables induces a minimal model for the formula~\cite{Marques-Silva:2013:MonotonePredicates}. 
+The circuit is rooted in the explanation clause.  
+That explanation clause is antecent of binary implication chains. 
+All implied variables are implied in their positive polarity, and the inputs of the circuit are the interval variables. 
+Thus, we can compute prime implicants by minimizing the number of positively assigned interval variables. 
+We use an algorithm which is very similar to what we have presented earlier~\cite{Iser:2013:Minimizing}. 
 
-Algorithm~\ref{algo:prime} outlines the procedure. 
+For clarity, Algorithm~\ref{algo:prime} outlines the procedure. 
 The algorithm receives as input the formula $F$ and the set of input variables $I$, i.e., the set of all interval variables. 
 It then returns the set of all minimal assignments $P$ under projection to the input variables. 
 In the outer loop (line~2), we subsequently generate models for $F$ (lines~1 and~15). 
