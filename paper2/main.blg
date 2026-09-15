@@ -1,0 +1,51 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: plain.bst
+Database file #1: main.bib
+Repeated entry---line 379 of file main.bib
+ : @inproceedings{Darwiche:2020:Reasons
+ :                                     ,
+I'm skipping whatever remains of this entry
+You've used 19 entries,
+            2118 wiz_defined-function locations,
+            645 strings with 9887 characters,
+and the built_in function-call counts, 9029 in all, are:
+= -- 845
+> -- 587
+< -- 16
++ -- 221
+- -- 200
+* -- 724
+:= -- 1491
+add.period$ -- 65
+call.type$ -- 19
+change.case$ -- 140
+chr.to.int$ -- 0
+cite$ -- 19
+duplicate$ -- 314
+empty$ -- 594
+format.name$ -- 200
+if$ -- 1881
+int.to.chr$ -- 0
+int.to.str$ -- 19
+missing$ -- 19
+newline$ -- 98
+num.names$ -- 56
+pop$ -- 140
+preamble$ -- 1
+purify$ -- 123
+quote$ -- 0
+skip$ -- 242
+stack$ -- 0
+substring$ -- 479
+swap$ -- 117
+text.length$ -- 16
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 74
+warning$ -- 0
+while$ -- 83
+width$ -- 21
+write$ -- 225
+(There was 1 error message)

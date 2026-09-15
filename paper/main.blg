@@ -1,0 +1,56 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: plainurl.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: main.bib
+Repeated entry---line 379 of file main.bib
+ : @inproceedings{Darwiche:2020:Reasons
+ :                                     ,
+I'm skipping whatever remains of this entry
+You've used 24 entries,
+            2943 wiz_defined-function locations,
+            842 strings with 13457 characters,
+and the built_in function-call counts, 15431 in all, are:
+= -- 1604
+> -- 754
+< -- 25
++ -- 269
+- -- 243
+* -- 991
+:= -- 2212
+add.period$ -- 101
+call.type$ -- 24
+change.case$ -- 172
+chr.to.int$ -- 0
+cite$ -- 24
+duplicate$ -- 467
+empty$ -- 1300
+format.name$ -- 243
+if$ -- 3884
+int.to.chr$ -- 0
+int.to.str$ -- 24
+missing$ -- 24
+newline$ -- 140
+num.names$ -- 76
+pop$ -- 298
+preamble$ -- 1
+purify$ -- 150
+quote$ -- 0
+skip$ -- 959
+stack$ -- 0
+substring$ -- 680
+swap$ -- 184
+text.length$ -- 27
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 94
+warning$ -- 0
+while$ -- 113
+width$ -- 26
+write$ -- 322
+(There was 1 error message)

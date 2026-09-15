@@ -1,0 +1,98 @@
+\begin{thebibliography}{10}
+
+\bibitem{Alfonso:2014:Features}
+Enrique~Matos Alfonso and Norbert Manthey.
+\newblock New {CNF} features and formula classification.
+\newblock In Daniel~Le Berre, editor, {\em {POS-14.} Fifth Pragmatics of {SAT} workshop, a workshop of the {SAT} 2014 conference, part of FLoC 2014 during the Vienna Summer of Logic, July 13, 2014, Vienna, Austria}, volume~27 of {\em EPiC Series in Computing}, pages 57--71. EasyChair, 2014.
+
+\bibitem{Ansotegui:2019:Community}
+Carlos Ans{\'{o}}tegui, Maria~Luisa Bonet, Jes{\'{u}}s Gir{\'{a}}ldez{-}Cru, Jordi Levy, and Laurent Simon.
+\newblock Community structure in industrial {SAT} instances.
+\newblock {\em J. Artif. Intell. Res.}, 66:443--472, 2019.
+
+\bibitem{Arrieta:2019:XAI}
+Alejandro~Barredo Arrieta, Natalia~D{\'{\i}}az Rodr{\'{\i}}guez, Javier~Del Ser, Adrien Bennetot, Siham Tabik, Alberto Barbado, Salvador Garc{\'{\i}}a, Sergio Gil{-}Lopez, Daniel Molina, Richard Benjamins, Raja Chatila, and Francisco Herrera.
+\newblock Explainable artificial intelligence {(XAI):} concepts, taxonomies, opportunities and challenges toward responsible {AI}.
+\newblock {\em CoRR}, abs/1910.10045, 2019.
+
+\bibitem{Audemard:2021:Intelligibility}
+Gilles Audemard, Steve Bellart, Louenas Bounia, Fr{\'{e}}d{\'{e}}ric Koriche, Jean{-}Marie Lagniez, and Pierre Marquis.
+\newblock On the computational intelligibility of boolean classifiers.
+\newblock In Meghyn Bienvenu, Gerhard Lakemeyer, and Esra Erdem, editors, {\em Proceedings of the 18th International Conference on Principles of Knowledge Representation and Reasoning, {KR} 2021, Online event, November 3-12, 2021}, pages 74--86, 2021.
+
+\bibitem{Audemard:2020:XAI}
+Gilles Audemard, Fr{\'{e}}d{\'{e}}ric Koriche, and Pierre Marquis.
+\newblock On tractable {XAI} queries based on compiled representations.
+\newblock In Diego Calvanese, Esra Erdem, and Michael Thielscher, editors, {\em Proceedings of the 17th International Conference on Principles of Knowledge Representation and Reasoning, {KR} 2020, Rhodes, Greece, September 12-18, 2020}, pages 838--849, 2020.
+
+\bibitem{Balyo:2016:Ipasir}
+Tom{\'{a}}s Balyo, Armin Biere, Ashlin Iser, and Carsten Sinz.
+\newblock {SAT} race 2015.
+\newblock {\em Artif. Intell.}, 241:45--65, 2016.
+
+\bibitem{Biere:2020:Cadical}
+Armin Biere, Katalin Fazekas, Mathias Fleury, and Maximillian Heisinger.
+\newblock {CaDiCaL}, {Kissat}, {Paracooba}, {Plingeling} and {Treengeling} entering the {SAT Competition 2020}.
+\newblock In Tomas Balyo, Nils Froleyks, Marijn Heule, Ashlin Iser, Matti J{\"a}rvisalo, and Martin Suda, editors, {\em Proc.~of {SAT Competition} 2020 -- Solver and Benchmark Descriptions}, volume B-2020-1 of {\em Department of Computer Science Report Series B}, pages 51--53. University of Helsinki, 2020.
+
+\bibitem{Choi:2020:RF}
+Arthur Choi, Andy Shih, Anchal Goyanka, and Adnan Darwiche.
+\newblock On symbolically encoding the behavior of random forests.
+\newblock {\em CoRR}, abs/2007.01493, 2020.
+
+\bibitem{Darwiche:2020:Reasons}
+Adnan Darwiche and Auguste Hirth.
+\newblock On the reasons behind decisions.
+\newblock In Giuseppe~De Giacomo, Alejandro Catal{\'{a}}, Bistra Dilkina, Michela Milano, Sen{\'{e}}n Barro, Alberto Bugar{\'{\i}}n, and J{\'{e}}r{\^{o}}me Lang, editors, {\em {ECAI} 2020 - 24th European Conference on Artificial Intelligence, 29 August-8 September 2020, Santiago de Compostela, Spain, August 29 - September 8, 2020 - Including 10th Conference on Prestigious Applications of Artificial Intelligence {(PAIS} 2020)}, volume 325 of {\em Frontiers in Artificial Intelligence and Applications}, pages 712--720. {IOS} Press, 2020.
+
+\bibitem{Froleyks:2021:SC2020}
+Nils Froleyks, Marijn Heule, Ashlin Iser, Matti J{\"{a}}rvisalo, and Martin Suda.
+\newblock {SAT} competition 2020.
+\newblock {\em Artif. Intell.}, 301:103572, 2021.
+
+\bibitem{Hastie:2009}
+Trevor Hastie, Robert Tibshirani, and Jerome~H. Friedman.
+\newblock {\em The Elements of Statistical Learning: Data Mining, Inference, and Prediction, 2nd Edition}.
+\newblock Springer Series in Statistics. Springer, 2009.
+
+\bibitem{Iser:2020:Disse}
+Ashlin Iser.
+\newblock {\em Recognition and Exploitation of Gate Structure in {SAT} Solving}.
+\newblock PhD thesis, Karlsruhe Institute of Technology, Germany, 2020.
+
+\bibitem{Iser:2015:Gates}
+Ashlin Iser, Norbert Manthey, and Carsten Sinz.
+\newblock Recognition of nested gates in {CNF} formulas.
+\newblock In Marijn Heule and Sean~A. Weaver, editors, {\em Theory and Applications of Satisfiability Testing - {SAT} 2015 - 18th International Conference, Austin, TX, USA, September 24-27, 2015, Proceedings}, volume 9340 of {\em Lecture Notes in Computer Science}, pages 255--271. Springer, 2015.
+
+\bibitem{Iser:2018:GDB}
+Ashlin Iser and Carsten Sinz.
+\newblock A problem meta-data library for research in {SAT}.
+\newblock In Daniel~Le Berre and Matti J{\"{a}}rvisalo, editors, {\em Proceedings of Pragmatics of {SAT} 2015, Austin, Texas, USA, September 23, 2015 / Pragmatics of {SAT} 2018, Oxford, UK, July 7, 2018}, volume~59 of {\em EPiC Series in Computing}, pages 144--152. EasyChair, 2018.
+
+\bibitem{Iser:2013:Minimizing}
+Ashlin Iser, Carsten Sinz, and Mana Taghdiri.
+\newblock Minimizing models for tseitin-encoded {SAT} instances.
+\newblock In Matti J{\"{a}}rvisalo and Allen~Van Gelder, editors, {\em Theory and Applications of Satisfiability Testing - {SAT} 2013 - 16th International Conference, Helsinki, Finland, July 8-12, 2013. Proceedings}, volume 7962 of {\em Lecture Notes in Computer Science}, pages 224--232. Springer, 2013.
+
+\bibitem{Li:2021:Hierarchical}
+Chunxiao Li, Jonathan Chung, Soham Mukherjee, Marc Vinyals, Noah Fleming, Antonina Kolokolova, Alice Mu, and Vijay Ganesh.
+\newblock On the hierarchical community structure of practical boolean formulas.
+\newblock In Chu{-}Min Li and Felip Many{\`{a}}, editors, {\em Theory and Applications of Satisfiability Testing - {SAT} 2021 - 24th International Conference, Barcelona, Spain, July 5-9, 2021, Proceedings}, volume 12831 of {\em Lecture Notes in Computer Science}, pages 359--376. Springer, 2021.
+
+\bibitem{Pedregosa:2011:Scikit}
+Fabian Pedregosa, Ga{\"e}l Varoquaux, Alexandre Gramfort, Vincent Michel, Bertrand Thirion, Olivier Grisel, Mathieu Blondel, Peter Prettenhofer, Ron Weiss, Vincent Dubourg, et~al.
+\newblock Scikit-learn: Machine learning in python.
+\newblock {\em Journal of machine learning research}, 12(Oct):2825--2830, 2011.
+
+\bibitem{Percy:2021:Accountability}
+Chris Percy, Simo Dragicevic, Sanjoy Sarkar, and Artur~S. d'Avila Garcez.
+\newblock Accountability in {AI:} from principles to industry-specific accreditation.
+\newblock {\em CoRR}, abs/2110.09232, 2021.
+
+\bibitem{Xu:2008:SATzilla}
+Lin Xu, Frank Hutter, Holger~H. Hoos, and Kevin Leyton{-}Brown.
+\newblock Satzilla: Portfolio-based algorithm selection for {SAT}.
+\newblock {\em J. Artif. Intell. Res.}, 32:565--606, 2008.
+
+\end{thebibliography}

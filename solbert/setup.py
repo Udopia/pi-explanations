@@ -1,5 +1,5 @@
 """
-Solbert -- Copyright (c) 2020, Markus Iser, KIT - Karlsruhe Institute of Technology
+Solbert -- Copyright (c) 2020, Ashlin Iser, KIT - Karlsruhe Institute of Technology
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,4 +26,4 @@ module = Extension("solbert",
         include_dirs=["."],
         sources = ["src/solbert.cc"])
 
-setup(name="solbert", version="1.0", author="Markus Iser", description="Accelerator Module for Explainer", ext_modules=[module])
+setup(name="solbert", version="1.0", author="Ashlin Iser", description="Accelerator Module for Explainer", ext_modules=[module])

@@ -1,5 +1,5 @@
 /*************************************************************************************************
-Solbert -- Copyright (c) 2022, Markus Iser, KIT - Karlsruhe Institute of Technology
+Solbert -- Copyright (c) 2022, Ashlin Iser, KIT - Karlsruhe Institute of Technology
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction,
