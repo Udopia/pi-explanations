@@ -26,6 +26,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "src/apps/PrimeImplicants.h"
 #include "src/apps/EnumerateModels.h"
 
+#include "src/apps/MonotonicCircuit.h"
 #include "src/apps/ModelIterator.h"
 #include "src/apps/PrimeImplicants2.h"
 
@@ -135,10 +136,25 @@ static struct PyModuleDef solbert = {
 };
 
 PyMODINIT_FUNC PyInit_solbert(void) {
+    if (PyType_Ready(&ModelIteratorType) < 0) { return nullptr; }
+    if (PyType_Ready(&MonotonicCircuitType) < 0) { return nullptr; }
+
     PyObject* mod = PyModule_Create(&solbert);
+    if (mod == nullptr) { return nullptr; }
 
     Py_INCREF((PyObject*) &ModelIteratorType);
-    PyModule_AddObject(mod, "model_iterator", (PyObject*) &ModelIteratorType);
+    if (PyModule_AddObject(mod, "model_iterator", (PyObject*) &ModelIteratorType) < 0) {
+        Py_DECREF(&ModelIteratorType);
+        Py_DECREF(mod);
+        return nullptr;
+    }
+
+    Py_INCREF((PyObject*) &MonotonicCircuitType);
+    if (PyModule_AddObject(mod, "monotonic_circuit", (PyObject*) &MonotonicCircuitType) < 0) {
+        Py_DECREF(&MonotonicCircuitType);
+        Py_DECREF(mod);
+        return nullptr;
+    }
 
     return mod;
 }

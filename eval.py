@@ -17,9 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from argparse import ArgumentParser
+from ssl import ALERT_DESCRIPTION_UNEXPECTED_MESSAGE
 from gbd_tool.gbd_api import GBD
 from sklearn import tree, ensemble
-from explain import FamilyExplainer, PortfolioExplainer
+from explain import FamilyExplainer, PortfolioExplainer, InterestingExplainer
 
 
 def explain_portfolio(model_getter, api: GBD):
@@ -34,24 +36,38 @@ def explain_family(model_getter, api: GBD):
     ex.explain()
 
 
+def explain_interesting(model_getter, api: GBD):
+    ex = InterestingExplainer(model_getter, api)
+    ex.train_test_accuracy()
+    ex.explain()
+
+
 def main():
     databases = [
         "/home/iser/git/gbd-data/meta.db",
         "/home/iser/git/gbd-data/base.db",
         "/home/iser/git/gbd-data/gate.db",
-        "/home/iser/git/gbd-data/sc2020.db"
+        "/home/iser/git/gbd-data/sc2020.db",
+        "/home/iser/git/gbd-data/minisat.db"
     ]
+
+    parser = ArgumentParser(description='Solbert')
+    parser.add_argument("num", type=int)
+    args = parser.parse_args()
+
+    num = args.num or 1
+
+    print(num)
 
     with GBD(databases, jobs=8) as api:
         seed = 0
-        get_decision_tree = lambda : tree.DecisionTreeClassifier(random_state=seed)
-        get_random_forest2 = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=2)
-        get_random_forest3 = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=3)
-        #explain_portfolio(get_decision_tree, api)
-        #explain_portfolio(get_random_forest2, api)
-        explain_portfolio(get_random_forest3, api)
-        #explain_family(get_decision_tree, api)
-        #explain_family(get_random_forest2, api)
+        trees = 2
+        model = lambda : tree.DecisionTreeClassifier(random_state=seed)
+        if num != 1:
+            model = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=num)
+        #explain_portfolio(model, api)
+        explain_family(model, api)
+        #explain_interesting(model, api)
 
 if __name__ == '__main__':
     main()

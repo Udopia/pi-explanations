@@ -23,6 +23,15 @@ from tree_encoder import VariableProducer
 from solbert import compute_prime_implicants
 from solbert import enumerate_models
 from solbert import model_iterator
+from solbert import monotonic_circuit
+
+
+def explain_comb(clauses, intervall, combs):
+    moci = monotonic_circuit(clauses, intervall)
+    for term in combs:
+        moci.append_root(term)
+        moci.update_prime_implicants()
+    return moci.get_primp()
 
 class RandomForestEncoder:
 
@@ -49,6 +58,15 @@ class RandomForestEncoder:
         self.vdeactivateright = []
         for feat_id in range(self.rfw.n_features()):
             self.vdeactivateright.append([ self.new_var() for _ in self.rfw.feature_values(feat_id) ])
+        # sample variables:
+        self.samplevars = []
+        df = self.rfw.lhs.reset_index()
+        df.drop(["level_0"], axis=1, inplace=True)
+        df.drop(["index"], axis=1, inplace=True)
+        print(df)
+        leaf_ids = self.rfw.clf.apply(df)
+        for index, row in enumerate(leaf_ids):
+            print(index, list(row))
         # base encoding
         self.clauses = self.encode()
         total_comb = 1
@@ -59,7 +77,7 @@ class RandomForestEncoder:
         self.comb = [ [ ] for _ in range(self.rfw.n_classes()) ] 
         self.enumerate_valid_combinations()
         print("Valid Combinations: {}".format(sum(len(valid_combs) for valid_combs in self.comb)))
-        self.pool = multiprocessing.Pool(processes=4)
+        self.pool = multiprocessing.Pool(processes=5)
 
     def __del__(self):
         self.pool.terminate()
@@ -95,8 +113,9 @@ class RandomForestEncoder:
 
     def explain(self):
         implicants = dict()
-        for cat in range(self.rfw.n_classes()):
-            target = self.encode_target_class(cat)
+        for class_id in range(self.rfw.n_classes()):
+            target = self.encode_target_class(class_id)
+            cat = self.rfw.class_name(class_id)
             implicants[cat] = compute_prime_implicants(self.clauses + target, self.vintervall)
             implicants[cat].sort(key=len)
         return implicants
@@ -107,6 +126,36 @@ class RandomForestEncoder:
         for class_id in range(self.rfw.n_classes()):
             target = self.encode_target_class(class_id)
             res = self.pool.apply_async(compute_prime_implicants, (self.clauses + target, self.vintervall))
+            results.append(res)
+        implicants = dict()
+        for class_id in range(self.rfw.n_classes()):
+            cat = self.rfw.class_name(class_id)
+            implicants[cat] = results[class_id].get()
+            implicants[cat].sort(key=len)
+        return implicants
+
+
+    def explain_incremental(self):
+        implicants = dict()
+        for class_id in range(self.rfw.n_classes()):
+            cat = self.rfw.class_name(class_id)
+            implicants[cat] = self.explain_class_incremental(class_id)
+            implicants[cat].sort(key=len)
+        return implicants
+
+    
+    def explain_class_incremental(self, class_id):
+        moci = monotonic_circuit(self.clauses, self.vintervall)
+        for term in self.comb[class_id]:
+            moci.append_root(term)
+            moci.update_prime_implicants()
+        return moci.get_primp()
+
+
+    def explain_incremental_parallel(self):
+        results = list()
+        for class_id in range(self.rfw.n_classes()):
+            res = self.pool.apply_async(explain_comb, (self.clauses, self.vintervall, self.comb[class_id]))
             results.append(res)
         implicants = dict()
         for class_id in range(self.rfw.n_classes()):
@@ -229,6 +278,15 @@ class RandomForestEncoder:
         for comb in model_iterator(clauses, project):
             class_id = self.get_class(comb)
             self.comb[class_id].append(comb)
+
+
+    def encode_sample_constraints(self):
+        clauses = []
+        for sample_id in []:
+            for tree_id in range(self.rfw.n_trees()):
+                for node_id in []:
+                    pass
+        return clauses
 
 
     def encode_combination_constraints(self):

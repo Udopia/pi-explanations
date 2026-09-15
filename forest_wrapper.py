@@ -26,6 +26,7 @@ class RandomForestWrapper:
         self.feature_names = list(lhs)
         self.class_names = list(rhs.cat.categories)
         self.trees = [ DecisionTreeWrapper(tree, lhs, rhs) for tree in self.clf.estimators_ ]
+        self.lhs = lhs.reset_index()
         # calc values:
         self.feature_splits = [ [ np.infty, ] for _ in range(self.n_features()) ]
         for tree in self.trees:

@@ -1,6 +1,4 @@
-\documentclass[a4paper, USenglish, cleveref, autoref, thm-restate]{lipics-v2021}
-
-\bibliographystyle{plainurl}
+\documentclass{easychair}
 
 \usepackage[T1]{fontenc} 
 \usepackage[utf8]{inputenc}
@@ -28,30 +26,34 @@
 \newtheorem{encoding}{Encoding}[section]
 
 
-\title{Explaining SAT Benchmark Classifiers with Prime~Implicants}
-\author{Markus Iser}{Karlsruhe Institute of Technology (KIT), Institute of Theoretical Informatics, Algorithm Engineering, Germany \and \url{https://algo2.iti.kit.edu/english/3986.php}}{markus.iser@kit.edu}{https://orcid.org/0000-0003-2904-232X}{}
-\Copyright{Markus Iser}
+\title{Calculating Sufficient Reasons for Random~Forest~Classifiers}
+\author{Markus Iser}
+
+\institute {
+Algorithm Engineering, Institute of Theoretical Informatics, KIT-Department of Informatics, Karlsruhe Institute of Technology (KIT), Germany
+}
+
 \authorrunning{M. Iser}
-\ccsdesc{Theory of computation~Logic and verification}
-\ccsdesc{Computing methodologies~Supervised learning by classification}
-\keywords{Benchmarks, Explainable Algorithm Selection, Prime Implicants}
+\titlerunning{A Positive Monotonic Circuit Encoding for Random Forest Classifiers}
+
 
 \begin{document}
 \maketitle
 \begin{abstract}
-Taxonomies for benchmark instances can be derived in several ways. For example, this can be based on their theoretical properties, or it can be based on their origin, e.g., a concrete application. 
-Some algorithm selectors even generate instance classes based on a set of features in an unsupervised manner. 
-We see a gap in the explainability of such approaches. 
-In this paper, we present a SAT encoding for decision tree and random forest classifiers that we can use to generate prime implicants. 
-We then apply this encoding to generate minimal explanations for two types of classifiers. 
-The first type of classifier was trained to map SAT instances to their instance family.
-The second type of classifier was trained as an instance-specific SAT solver selector on a small portfolio.
-We show that the explainability of machine learning methods is useful for interpreting experiments as it provides valuable feedback to the algorithm developer.
+In this paper, we formalize the implementations of decision tree and random forest classifiers of the Python Scikit-learn package, and we present a CNF encoding which can be used to calculate sufficient reasons a.k.a. prime implicants for them. 
+Our decision tree encoding resembles a monotonic combinational circuit with pure input variables, of which we take advantage in our method for incremental enumeration of its prime implicants. 
+Encoding the combination of several decision trees in a random forest would add a non-monotonic evaluation function to the root of the encoded circuit. 
+In our approach, we solve an auxiliary SAT problem for enumerating valid leaf-node combinations of the random forest. 
+Each valid leaf-node combination is used to incrementally update the original monotonic circuit encoding by extending the DNF at its root with a new term. 
+Preliminary results show that enumeration of prime implicants by incrementally updating the encoding is by order of magnitudes faster than one-shot solving of the monolithic formula. 
+We present preliminary runtime data, and some initial data about the size and number of samples found when translating the prime implicants back into database queries. 
 \end{abstract}
 
 
 %%%%%%%
 \section{Introduction}
+
+\subsection{Motivation}
 
 Models created by inductive learning algorithms are useful in practice.
 The explainability of such automatically generated models is the subject of current research projects~\cite{Audemard:2021:Intelligibility, Darwiche:2020:Reasons}.
@@ -68,22 +70,7 @@ One of the explanation queries they analyze is prime implicants, which are also 
 Choi et al. present an encoding of decision tree and random forest classifiers for computing prime implicants~\cite{Choi:2020:RF}. 
 However, they report on limitations of their approach when encoding cardinality constraints for multivalued variables. 
 
-Inductive learning methods have been used in various ways to solve SAT instances more efficiently. 
-Cherif et al. successfully use reinforcement learning to control the switching of branching heuristics~\cite{Cherif:2021:KissatMAB}. 
-Soos et al. present clause forgetting heuristics based on supervised learning~\cite{Soos:2019:CrystalBall}. 
-Prediction models have also been used to create algorithm selectors for portfolios of SAT solvers (cf. SATzilla~\cite{Xu:2008:SATzilla}). 
-In their approach known as instance-specific algorithm configuration (ISAC), Kadioglu et al. use unsuperived learning to create clusters in the feature space of SAT instances~\cite{Kadioglu:2010:ISAC}. 
-For each cluster, a configurator optimizes a SAT solver for the instances in that cluster. 
-
-Prediction models for algorithm selection in SAT induce, in a sense, a taxonomy for SAT instances. 
-This differs from the classes used in common practice, where instances are usually assigned to an instance family~\cite{Froleyks:2021:SC2020}. 
-The instance family may for example describe a category of SAT applications (such as \textsf{hardware verification}), or refer to a specific class of instances that is of theoretical interest (such as \textsf{pigeon hole}). 
-
-Elffers et al. analyze SAT solver configurations for instance classes of theoretical interest~\cite{Elffers:2018:Insights}. 
-Audemard and Simon devise instance classes based on solver runtime parameters, and then they suggest class specific solver configurations~\cite{Audemard:2016:Extreme}. 
-
-Given the circumstances sketched so far, we conclude that explanations of prediction models for SAT benchmarks can provide valuable feedback to the algorithm engineer about what was learned. 
-Such explanations allow the algorithm engineer to reason about the induced instance taxonomy, and to improve their algorithm or configuration choices. 
+\subsection{Contributions}
 
 In this paper, we present a propositional, conjunctive normal form (CNF) encoding of decision tree classifiers and random forests. 
 The formula which we encode resembles a \emph{monotonic} combinatorial circuit, which makes it easy to compute prime implicants for it by using an off-the-shelf incremental SAT solver. 
@@ -91,6 +78,8 @@ We present a tool which can encode decision tree and random forest classifiers g
 Our tool uses the SAT solver \verb!CaDiCaL!~\cite{Biere:2020:Cadical} via its \verb!IPASIR!~\cite{Balyo:2016:Ipasir} interface to generate prime implicants. 
 All prime implicants are decoded into the minimal set of case-distinctions in the features space which they represent. 
 We evaluate our tool on classifiers for SAT instances and show that prime implicants deliver concise explanations of classifier decisions. 
+
+\subsection{Outline}
 
 The document is structured as follows. 
 In Section~\ref{sec:prelim}, we present a formalization of decision tree classifiers and random forest classifiers as they are implemented in the Python package \verb!scikit-learn!. 
@@ -662,6 +651,7 @@ We will also study feature importance measures and generalization power based on
 Moreover, we will evaluate portfolio performance with solver selection based on only a few prime implicants. 
 
 %%%%%%%
+\bibliographystyle{plain}
 \bibliography{main}
 
 \end{document}
