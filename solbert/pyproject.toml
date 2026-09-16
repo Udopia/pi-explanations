@@ -4,9 +4,9 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "solbert"
-version = "1.0.0"
+version = "1.0.1"
 description = "SAT-based computation of prime implicants and projected models"
-readme = "README.md"
+readme = "../README.md"
 requires-python = ">=3.10"
 license = "GPL-3.0-only"
 dependencies = [
@@ -29,7 +29,8 @@ classifiers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/Udopia/pi-explanations"
+Repository = "https://github.com/Udopia/solbert"
+Paper = "https://github.com/Udopia/solbert/tree/main/paper2"
 
 [project.optional-dependencies]
 plot = ["matplotlib"]
@@ -40,7 +41,7 @@ cmake.build-type = "Release"
 wheel.packages = ["solbert"]
 sdist.include = [
     "CMakeLists.txt",
-    "README.md",
+    "../README.md",
     "lib/ipasir.h",
     "solbert/**",
     "src/**",
