@@ -4,6 +4,12 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the built distributions to PyPI
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   # Native runners avoid QEMU and produce one portable wheel set per architecture.
@@ -111,7 +117,7 @@ jobs:
           path: solbert/dist/*.tar.gz
 
   release:
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || inputs.publish
     needs: [build-linux, build-macos, build-sdist]
     runs-on: ubuntu-latest
     permissions:
