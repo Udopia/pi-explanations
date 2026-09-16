@@ -12,6 +12,10 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
 
 set(SOLBERT_CADICAL_TAG "rel-3.0.1" CACHE STRING "CaDiCaL git tag or commit")
 set(SOLBERT_CADICAL_LIBRARY "" CACHE FILEPATH "Use an existing libcadical archive instead of building CaDiCaL")
+set(SOLBERT_CADICAL_BUILD_JOBS "1" CACHE STRING "Parallel jobs for local CaDiCaL builds")
+if(NOT SOLBERT_CADICAL_BUILD_JOBS MATCHES "^[1-9][0-9]*$")
+    message(FATAL_ERROR "SOLBERT_CADICAL_BUILD_JOBS must be a positive integer")
+endif()
 
 if(SOLBERT_CADICAL_LIBRARY)
     if(NOT EXISTS "${SOLBERT_CADICAL_LIBRARY}")
@@ -52,7 +56,7 @@ else()
                 "CFLAGS=${CADICAL_COMPILE_FLAGS}"
                 "CXXFLAGS=${CADICAL_COMPILE_FLAGS}"
                 ./configure
-        BUILD_COMMAND "${MAKE_EXECUTABLE}" -j1
+        BUILD_COMMAND "${MAKE_EXECUTABLE}" "-j${SOLBERT_CADICAL_BUILD_JOBS}"
         INSTALL_COMMAND ""
         BUILD_BYPRODUCTS "${CADICAL_LIBRARY}"
         BUILD_IN_SOURCE TRUE
