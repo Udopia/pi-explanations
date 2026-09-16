@@ -17,22 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
-import pandas as pd
-from sklearn import tree, ensemble
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
+from .._logging import eprint
 
-from gbd_tool.gbd_api import GBD
-from gbd_tool.util import eprint
-
-from tree_encoder import DecisionTreeEncoder
-from tree_wrapper import DecisionTreeWrapper
+from .encoder import DecisionTreeEncoder
+from .wrapper import DecisionTreeWrapper
 
 
 class DecisionTreeExplainer:
 
-    def __init__(self, query, api: GBD, wrapper: DecisionTreeWrapper):
+    def __init__(self, query, api, wrapper: DecisionTreeWrapper):
         self.query = query
         self.api = api
         self.wrapper = wrapper
@@ -75,11 +68,11 @@ class DecisionTreeExplainer:
         I = []
         for i, imp in enumerate(imps):
             explanation = self.encoder.decode(imp)
-            hashes = self.api.query_search(self.query + " and " + explanation["query"])
+            result = self.api.query(self.query + " and " + explanation["query"])
             eprint(explanation)
-            eprint("Samples: {}".format(len(hashes)))
+            eprint("Samples: {}".format(len(result)))
             size = explanation["features"]
-            samples = len(hashes)
+            samples = len(result)
             I.append((size, samples))
         I.sort(key = lambda x: x[1], reverse=True)
         print("Leaf Depths and Samples: " + str(L))
@@ -116,9 +109,7 @@ class DecisionTreeExplainer:
             ncd_imps = [ imp[0] for imp in I ]
             if sizes[i] > 0:#350:
                 K = ["NCD (Leafs)", "NCD (Implicants)"]
-                df = pd.concat([pd.Series(ncd_leafs), pd.Series(ncd_imps)], keys=K, ignore_index=True, axis=1)
-                print(df)
                 plt.title("Family: {}, NCD Ratio: {:2f}".format(cat.upper(), mean(ncd_imps) / mean(ncd_leafs)))
-                plt.boxplot(df)
+                plt.boxplot([ncd_leafs, ncd_imps])
                 plt.xticks(range(1, len(K)+1), K)
                 plt.show()

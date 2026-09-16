@@ -17,13 +17,12 @@
 import numpy as np
 import multiprocessing
 
-from forest_wrapper import RandomForestWrapper
-from tree_encoder import VariableProducer
+from ..tree.encoder import VariableProducer
+from .wrapper import RandomForestWrapper
 
-from solbert import compute_prime_implicants
-from solbert import enumerate_models
-from solbert import model_iterator
-from solbert import monotonic_circuit
+from .._native import compute_prime_implicants
+from .._native import model_iterator
+from .._native import monotonic_circuit
 
 
 def explain_comb(clauses, intervall, combs):
@@ -60,11 +59,9 @@ class RandomForestEncoder:
             self.vdeactivateright.append([ self.new_var() for _ in self.rfw.feature_values(feat_id) ])
         # sample variables:
         self.samplevars = []
-        df = self.rfw.lhs.reset_index()
-        df.drop(["level_0"], axis=1, inplace=True)
-        df.drop(["index"], axis=1, inplace=True)
+        df = self.rfw.lhs
         print(df)
-        leaf_ids = self.rfw.clf.apply(df)
+        leaf_ids = self.rfw.clf.apply(df.to_numpy())
         for index, row in enumerate(leaf_ids):
             print(index, list(row))
         # base encoding

@@ -1,0 +1,27 @@
+name: Build-Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Solbert
+        env:
+          CMAKE_BUILD_PARALLEL_LEVEL: "1"
+        run: python -m pip install ./solbert
+
+      - name: Run API tests
+        run: python solbert/test/test_solbert.py

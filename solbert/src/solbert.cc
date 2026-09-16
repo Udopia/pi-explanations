@@ -130,16 +130,16 @@ static PyMethodDef methods[] = {
     {nullptr, nullptr, 0, nullptr}
 };
 
-static struct PyModuleDef solbert = {
+static struct PyModuleDef native_module = {
     PyModuleDef_HEAD_INIT, 
-    "solbert", "Python Wrapper for Incremental SAT Applications", -1, methods
+    "_native", "Python Wrapper for Incremental SAT Applications", -1, methods
 };
 
-PyMODINIT_FUNC PyInit_solbert(void) {
+PyMODINIT_FUNC PyInit__native(void) {
     if (PyType_Ready(&ModelIteratorType) < 0) { return nullptr; }
     if (PyType_Ready(&MonotonicCircuitType) < 0) { return nullptr; }
 
-    PyObject* mod = PyModule_Create(&solbert);
+    PyObject* mod = PyModule_Create(&native_module);
     if (mod == nullptr) { return nullptr; }
 
     Py_INCREF((PyObject*) &ModelIteratorType);

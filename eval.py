@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
 
 # Determine Prime Implicants of Random Forest Classifiers
 # Copyright (C) 2022 Ashlin Iser, Karlsruhe Institute of Technology (KIT)
@@ -18,10 +17,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from argparse import ArgumentParser
-from ssl import ALERT_DESCRIPTION_UNEXPECTED_MESSAGE
-from gbd_tool.gbd_api import GBD
-from sklearn import tree, ensemble
-from explain import FamilyExplainer, PortfolioExplainer, InterestingExplainer
+
+from gbd_core.api import GBD
+from sklearn import ensemble, tree
+
+from explain import FamilyExplainer, InterestingExplainer, PortfolioExplainer
 
 
 def explain_portfolio(model_getter, api: GBD):
@@ -59,9 +59,8 @@ def main():
 
     print(num)
 
-    with GBD(databases, jobs=8) as api:
+    with GBD(databases) as api:
         seed = 0
-        trees = 2
         model = lambda : tree.DecisionTreeClassifier(random_state=seed)
         if num != 1:
             model = lambda : ensemble.RandomForestClassifier(random_state=seed, n_estimators=num)

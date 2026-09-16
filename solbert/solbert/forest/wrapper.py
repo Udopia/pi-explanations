@@ -15,20 +15,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import pandas as pd
+import polars as pl
 from sklearn import ensemble
-from tree_wrapper import DecisionTreeWrapper
+from ..tree.wrapper import DecisionTreeWrapper
 
 class RandomForestWrapper:
 
-    def __init__(self, clf: ensemble.RandomForestClassifier, lhs: pd.DataFrame, rhs: pd.Categorical):
+    def __init__(self, clf: ensemble.RandomForestClassifier, lhs: pl.DataFrame, rhs: pl.Series):
         self.clf = clf
-        self.feature_names = list(lhs)
-        self.class_names = list(rhs.cat.categories)
+        self.feature_names = lhs.columns
+        self.class_names = rhs.cat.get_categories().to_list()
         self.trees = [ DecisionTreeWrapper(tree, lhs, rhs) for tree in self.clf.estimators_ ]
-        self.lhs = lhs.reset_index()
+        self.lhs = lhs
         # calc values:
-        self.feature_splits = [ [ np.infty, ] for _ in range(self.n_features()) ]
+        self.feature_splits = [ [ np.inf, ] for _ in range(self.n_features()) ]
         for tree in self.trees:
             for feat, splits in enumerate(tree.feature_splits):
                 self.feature_splits[feat].extend(splits)

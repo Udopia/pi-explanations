@@ -15,15 +15,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import pandas as pd
+import polars as pl
 from sklearn import tree
 
 class DecisionTreeWrapper:
 
-    def __init__(self, clf: tree.DecisionTreeClassifier, lhs: pd.DataFrame, rhs: pd.Categorical):
+    def __init__(self, clf: tree.DecisionTreeClassifier, lhs: pl.DataFrame, rhs: pl.Series):
         self.clf = clf
-        self.feature_names = list(lhs)
-        self.class_names = list(rhs.cat.categories)
+        self.feature_names = lhs.columns
+        self.class_names = rhs.cat.get_categories().to_list()
         self.depths = [ 0 ] * self.n_nodes()
         # calc depths:
         stack = [ 0 ]
@@ -35,7 +35,7 @@ class DecisionTreeWrapper:
                 self.depths[left] = self.depths[right] = self.depths[node] + 1
                 stack.extend((left, right))
         # calc values:
-        self.feature_splits = [ [ np.infty, ] for _ in range(self.n_features()) ]
+        self.feature_splits = [ [ np.inf, ] for _ in range(self.n_features()) ]
         for node in range(self.n_nodes()):
             if self.is_inner_node(node):
                 feat = self.node_feature(node)

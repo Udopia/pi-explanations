@@ -16,9 +16,9 @@
 
 import numpy as np
 
-from tree_wrapper import DecisionTreeWrapper
+from .wrapper import DecisionTreeWrapper
 
-from solbert import compute_prime_implicants
+from .._native import compute_prime_implicants
 
 
 class VariableProducer:
@@ -192,17 +192,17 @@ class DecisionTreeEncoder:
             for feat_id in range(self.dtw.n_features()):
                 feat = self.dtw.feature_name(feat_id)
                 if not all(model[v-1] < 0 for v in self.vintervals[feat_id]):
-                    value_ranges = [ [-np.infty, np.infty] ]
+                    value_ranges = [ [-np.inf, np.inf] ]
                     for i in range(len(self.vintervals[feat_id])-1):
                         m0 = self.sat(model, self.vintervals[feat_id][i])
                         m1 = self.sat(model, self.vintervals[feat_id][i+1])
                         if m0 and not m1:
-                            if value_ranges[-1][0] != -np.infty:
-                                value_ranges.append([-np.infty, np.infty])
+                            if value_ranges[-1][0] != -np.inf:
+                                value_ranges.append([-np.inf, np.inf])
                             value_ranges[-1][0] = self.dtw.feature_value(feat_id, i)
                         elif not m0 and m1:
-                            if value_ranges[-1][1] != np.infty:
-                                value_ranges.append([-np.infty, np.infty])
+                            if value_ranges[-1][1] != np.inf:
+                                value_ranges.append([-np.inf, np.inf])
                             value_ranges[-1][1] = self.dtw.feature_value(feat_id, i)
                     print("{} in {}".format(feat, ", ".join([ "({}, {}]".format(v[0], v[1]) for v in value_ranges ])))
 

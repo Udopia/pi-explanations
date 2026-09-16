@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 # Determine Prime Implicants of Random Forest Classifiers
 # Copyright (C) 2022 Ashlin Iser, Karlsruhe Institute of Technology (KIT)
 # 
@@ -18,33 +15,46 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import pandas as pd
-from sklearn import tree, ensemble
+import polars as pl
+from gbd_core.api import GBD
+from gbd_core.util import eprint
+from sklearn import ensemble, tree
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from solbert.forest import RandomForestExplainer, RandomForestWrapper
+from solbert.tree import DecisionTreeExplainer, DecisionTreeWrapper
 
-from gbd_tool.gbd_api import GBD
-from gbd_tool.util import eprint
 
-from tree_wrapper import DecisionTreeWrapper
-from tree_explainer import DecisionTreeExplainer
-
-from forest_wrapper import RandomForestWrapper
-from forest_explainer import RandomForestExplainer
+REPLACEMENTS = {
+    "timeout": np.inf,
+    "memout": np.inf,
+    "empty": np.nan,
+    "failed": np.inf,
+}
 
 
 class Explainer:
 
-    def __init__(self, model_getter, api: GBD, df: pd.DataFrame, target, query):
+    def __init__(self, model_getter, api: GBD, df: pl.DataFrame, target, query):
         self.get_model = model_getter
         self.api = api
         self.target = target
         self.query = query
-        self.lhs = df #self.df.drop(self.df[self.df.hash.isin(exclude_hashes)].index)
-        self.lhs.drop(["hash"], axis=1, inplace=True)
-        self.rhs = self.lhs.pop(self.target).astype("category")
-        self.x = np.nan_to_num(self.lhs.to_numpy().astype(np.float32), nan=-1)
-        self.y = self.rhs.cat.codes.to_numpy()
+        self.lhs = df.drop("hash", self.target)
+        self.rhs = df.get_column(self.target).cast(pl.Categorical)
+        self.x = np.nan_to_num(
+            self.lhs.with_columns(
+                pl.col(pl.String).replace_strict(
+                    REPLACEMENTS,
+                    default=pl.col(pl.String).cast(pl.Float32, strict=False),
+                    return_dtype=pl.Float32,
+                )
+            )
+            .cast(pl.Float32, strict=False)
+            .to_numpy(),
+            nan=-1,
+        )
+        self.y = self.rhs.to_physical().to_numpy()
 
 
     def train_test_accuracy(self, seed=0):
@@ -54,7 +64,7 @@ class Explainer:
         model.fit(xtrain, ytrain)
         ypred=model.predict(xtest)
         acc = accuracy_score(ytest, ypred)
-        print("Accuracy: {}".format(acc))
+        print(f"Accuracy: {acc}")
 
     def explain(self):
         eprint("Training ...")
@@ -69,7 +79,7 @@ class Explainer:
             explainer = RandomForestExplainer(self.query, self.api, wrapper)
             #explainer.print_implicants()
         else:
-            eprint("Cannot explain models of type {}".format(type(model)))
+            eprint(f"Cannot explain models of type {type(model)}")
 
 
 class InterestingExplainer(Explainer):
@@ -77,7 +87,7 @@ class InterestingExplainer(Explainer):
     def __init__(self, model_getter, api: GBD):
         query = "minisat1m != emtpy"
         source = api.get_features("base_db") #+ api.get_features("gate_db")
-        df = api.query_search2(query, [], source + [ "minisat1m" ], replace=[ ("timeout", np.inf), ("memout", np.inf), ("empty", np.nan), ("failed", np.inf) ])
+        df = api.query(query, resolve=source + ["minisat1m"])
         Explainer.__init__(self, model_getter, api, df, "minisat1m", query)
 
 
@@ -86,21 +96,33 @@ class FamilyExplainer(Explainer):
     def __init__(self, model_getter, api: GBD):
         query = "track like %20% and family != unknown and family != agile and family unlike %random%"# and family like b%"
         source = api.get_features("base_db") #+ api.get_features("gate_db")
-        df = api.query_search2(query, [], source + [ "family" ], replace=[ ("timeout", np.inf), ("memout", np.inf), ("empty", np.nan), ("failed", np.inf) ])
+        df = api.query(query, resolve=source + ["family"])
         Explainer.__init__(self, model_getter, api, df, "family", query)
 
 
 class PortfolioExplainer(Explainer):
 
     def __init__(self, model_getter, api: GBD, solvers):
-        notout = " or ".join([ "({s} != timeout and {s} != memout)".format(s=solver) for solver in solvers ])
-        query = "track = main_2020 and ({})".format(notout)
+        notout = " or ".join(
+            f"({solver} != timeout and {solver} != memout)" for solver in solvers
+        )
+        query = f"track = main_2020 and ({notout})"
         source = api.get_features("base_db") + api.get_features("gate_db")
-        df = api.query_search2(query, [], source + solvers, replace=[ ("timeout", np.inf), ("memout", np.inf), ("empty", np.nan), ("failed", np.inf) ])
-        df["solver"] = "empty"
-        for s in solvers:
-            for idx, row in df.iterrows():
-                if float(row[s]) == min(row[solvers].astype(float)):
-                    row["solver"] = s
-        df.drop(solvers, axis=1, inplace=True)
+        df = api.query(query, resolve=source + solvers)
+        solver_values = [
+            pl.col(solver)
+            .cast(pl.String)
+            .replace_strict(
+                REPLACEMENTS,
+                default=pl.col(solver).cast(pl.Float64, strict=False),
+                return_dtype=pl.Float64,
+            )
+            for solver in solvers
+        ]
+        df = df.with_columns(
+            pl.concat_list(solver_values)
+            .list.arg_min()
+            .replace_strict(dict(enumerate(solvers)))
+            .alias("solver")
+        ).drop(solvers)
         Explainer.__init__(self, model_getter, api, df, "solver", query)

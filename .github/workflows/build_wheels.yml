@@ -1,0 +1,98 @@
+name: Build Wheels
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    strategy:
+      matrix:
+        include:
+          - { arch: x86_64, runner: ubuntu-latest, march: x86-64 }
+          - { arch: aarch64, runner: ubuntu-24.04-arm, march: armv8-a }
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v4.2.0
+        env:
+          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
+          CIBW_ENVIRONMENT_LINUX: 'CMAKE_BUILD_PARALLEL_LEVEL="1" CFLAGS="-O3 -march=${{ matrix.march }}" CXXFLAGS="-O3 -march=${{ matrix.march }}" LDFLAGS="-static-libstdc++ -static-libgcc"'
+        with:
+          package-dir: ./solbert
+          output-dir: wheelhouse
+
+      - name: Validate wheels
+        run: |
+          python -m pip install --upgrade -q twine
+          twine check wheelhouse/*.whl
+          for wheel in wheelhouse/*.whl; do zip -T "$wheel" >/dev/null; done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux-${{ matrix.arch }}
+          path: wheelhouse/*.whl
+
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v4.2.0
+        env:
+          CIBW_ARCHS_MACOS: arm64
+          CIBW_ENVIRONMENT_MACOS: 'CMAKE_BUILD_PARALLEL_LEVEL="1" MACOSX_DEPLOYMENT_TARGET="11.0"'
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
+        with:
+          package-dir: ./solbert
+          output-dir: wheelhouse
+
+      - name: Validate wheels
+        run: |
+          python -m pip install --upgrade -q twine
+          twine check wheelhouse/*.whl
+          for wheel in wheelhouse/*.whl; do zip -T "$wheel" >/dev/null; done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-arm64
+          path: wheelhouse/*.whl
+
+  build-sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Build source distribution
+        run: |
+          python -m pip install --upgrade -q build twine
+          python -m build --sdist solbert
+          twine check solbert/dist/*.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: solbert/dist/*.tar.gz
+
+  release:
+    if: github.event_name == 'release'
+    needs: [build-linux, build-macos, build-sdist]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

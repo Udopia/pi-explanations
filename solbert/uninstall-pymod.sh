@@ -1,7 +1,4 @@
-if [ ! -e uninstall.info ]; then
-	echo "uninstall.info not found"
-	exit
-fi
+#!/usr/bin/env sh
+set -eu
 
-tr '\n' '\0' < uninstall.info | xargs -0 sudo rm -f --
-rm uninstall.info
+python3 -m pip uninstall --yes solbert

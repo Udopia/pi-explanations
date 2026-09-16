@@ -19,16 +19,15 @@
 
 import time
 
-from gbd_tool.gbd_api import GBD
-from gbd_tool.util import eprint
+from .._logging import eprint
 
-from forest_encoder import RandomForestEncoder
-from forest_wrapper import RandomForestWrapper
+from .encoder import RandomForestEncoder
+from .wrapper import RandomForestWrapper
 
 
 class RandomForestExplainer:
 
-    def __init__(self, query, api: GBD, wrapper: RandomForestWrapper):
+    def __init__(self, query, api, wrapper: RandomForestWrapper):
         self.query = query
         self.api = api
         self.wrapper = wrapper
@@ -79,9 +78,9 @@ class RandomForestExplainer:
         I = []
         for imp in imps:
             explanation = self.encoder.decode(imp)
-            hashes = self.api.query_search(self.query + " and " + explanation["query"])
+            result = self.api.query(self.query + " and " + explanation["query"])
             size = explanation["features"]
-            samples = len(hashes)
+            samples = len(result)
             I.append((size, samples))
         I.sort(key = lambda x: x[1], reverse=True)        
         print("Class {} Implicant Size and Samples: {}".format(cat, str(I)))
