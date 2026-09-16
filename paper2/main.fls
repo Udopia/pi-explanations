@@ -1,9 +1,9 @@
-PWD /home/iser/git/xai/pi-explanations/paper2
+PWD /home/iser/git/xai/paper2
 INPUT /etc/texmf/web2c/texmf.cnf
 INPUT /usr/share/texmf/web2c/texmf.cnf
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /home/iser/git/xai/pi-explanations/paper2/main.tex
+INPUT /home/iser/git/xai/paper2/main.tex
 OUTPUT main.log
 INPUT ./easychair.cls
 INPUT easychair.cls
@@ -288,8 +288,14 @@ INPUT /usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
-OUTPUT main.out
+INPUT ./main.out
+INPUT ./main.out
+INPUT main.out
+INPUT main.out
 OUTPUT main.pdf
+INPUT ./main.out
+INPUT ./main.out
+OUTPUT main.out
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecrm1728.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecrm1200.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecrm0900.tfm
@@ -297,7 +303,6 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx0900.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecrm1440.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1440.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1000.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecti1000.tfm
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
@@ -325,6 +330,7 @@ INPUT /usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1000.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmss10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmss8.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmss8.tfm
