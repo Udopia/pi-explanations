@@ -23,15 +23,15 @@ else()
     find_program(MAKE_EXECUTABLE NAMES gmake make REQUIRED)
 
     set(CADICAL_ARCH_SUFFIX "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
-    set(CADICAL_CXXFLAGS "-fPIC")
+    set(CADICAL_COMPILE_FLAGS "-fPIC")
     if(APPLE)
         if(CMAKE_OSX_DEPLOYMENT_TARGET)
-            string(APPEND CADICAL_CXXFLAGS " -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+            string(APPEND CADICAL_COMPILE_FLAGS " -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
         endif()
         if(CMAKE_OSX_ARCHITECTURES)
             string(REPLACE ";" "_" CADICAL_ARCH_SUFFIX "macos-${CMAKE_OSX_ARCHITECTURES}")
             foreach(CADICAL_ARCH IN LISTS CMAKE_OSX_ARCHITECTURES)
-                string(APPEND CADICAL_CXXFLAGS " -arch ${CADICAL_ARCH}")
+                string(APPEND CADICAL_COMPILE_FLAGS " -arch ${CADICAL_ARCH}")
             endforeach()
         endif()
     endif()
@@ -48,7 +48,10 @@ else()
         PREFIX "${CADICAL_PREFIX}"
         SOURCE_DIR "${CADICAL_SOURCE_DIR}"
         CONFIGURE_COMMAND
-            ${CMAKE_COMMAND} -E env "CXXFLAGS=${CADICAL_CXXFLAGS}" ./configure
+            ${CMAKE_COMMAND} -E env
+                "CFLAGS=${CADICAL_COMPILE_FLAGS}"
+                "CXXFLAGS=${CADICAL_COMPILE_FLAGS}"
+                ./configure
         BUILD_COMMAND "${MAKE_EXECUTABLE}" -j1
         INSTALL_COMMAND ""
         BUILD_BYPRODUCTS "${CADICAL_LIBRARY}"
