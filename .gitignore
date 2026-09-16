@@ -5,6 +5,32 @@ CMakeFiles/
 uninstall.info
 cadical/
 
+# LaTeX artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv
+
+
 # cmake template:
 CMakeLists.txt.user
 CMakeCache.txt

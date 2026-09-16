@@ -1,6 +1,5 @@
-\documentclass[t]{beamer}
-%\documentclass[c]{beamer}
-\listfiles
+\documentclass[t]{sdqbeamer}
+%\documentclass[c]{sdqbeamer}
 
 \definecolor{normalbg}{HTML}{EDF2FC}
 \definecolor{normalfg}{HTML}{012528}
@@ -10,34 +9,14 @@
 \definecolor{alertbg}{HTML}{FAC05E}
 \definecolor{myblue}{HTML}{DA4167}
 
-\mode<presentation> {
-    \usetheme[english,titlepage0,20pt]{KIT}
-    \usefonttheme{structurebold}  
-    %\useinnertheme[shadow=true]{rounded}
-    %\setbeamercovered{transparent}
-    \setbeamertemplate{navigation symbols}{}
-
-    \setbeamertemplate{blocks}[rounded][shadow=true]
-    \setbeamercolor{block title}{fg=normalfg, bg=normalbg}
-    \setbeamercolor{block body}{fg=normalfg, bg=normalbg!20}
-    \setbeamercolor{block title example}{fg=normalfg, bg=examplebg!50}
-    \setbeamercolor{block body example}{fg=normalfg, bg=normalbg!20}
-    \setbeamercolor{block title alerted}{fg=normalfg, bg=alertbg!50}
-    \setbeamercolor{block body alerted}{fg=normalfg, bg=normalbg!20}
-
-    \setbeamertemplate{itemize item}{\color{normalsymbol}\textbullet}
-    \setbeamertemplate{itemize subitem}{\color{normalsymbol}\textbullet}
-    \setbeamercolor{item projected}{bg=normalsymbol, fg=normalsymbol}
-
-    \setbeamertemplate{itemize item}{\color{normalsymbol}\textbullet}
-    \setbeamertemplate{itemize subitem}{\color{normalsymbol}\tiny\raise1.5pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
-    \setbeamertemplate{itemize subsubitem}{\color{normalsymbol}\tiny\raise1.5pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
-    \setbeamertemplate{enumerate item}{\color{normalsymbol}\small\insertenumlabel.}
-    \setbeamertemplate{enumerate subitem}{\color{normalsymbol}\small\insertenumlabel.\insertsubenumlabel}
-    \setbeamertemplate{enumerate subsubitem}{\color{normalsymbol}\small\insertenumlabel.\insertsubenumlabel.\insertsubsubenumlabel}
-    \setbeamertemplate{enumerate mini template}{\color{normalsymbol}\small\insertenumlabel}
-}
-
+\setbeamercolor{block title}{fg=normalfg, bg=normalbg}
+\setbeamercolor{block body}{fg=normalfg, bg=normalbg!20}
+\setbeamercolor{block title example}{fg=normalfg, bg=examplebg!50}
+\setbeamercolor{block body example}{fg=normalfg, bg=normalbg!20}
+\setbeamertemplate{itemize item}{\color{normalsymbol}\textbullet}
+\setbeamertemplate{itemize subitem}{\color{normalsymbol}\textbullet}
+\setbeamercolor{item projected}{bg=normalsymbol, fg=normalsymbol}
+\renewcommand{\insertnavigation}[1]{} % remove navigation bar
 
 \usepackage[utf8]{inputenc}
 \usepackage[TS1,T1]{fontenc}
@@ -79,18 +58,24 @@
 \setlength{\leftmargini}{1em}
 \setlength{\leftmarginii}{1em}
 
+\hypersetup{
+	colorlinks=true,
+	urlcolor=kit-orange
+}
 
-\title{Calculating Sufficient Reasons for Random Forest Classifiers}
+
+\title[Sufficient Reasons]{Calculating Sufficient Reasons for Random Forest Classifiers}
 \author{Ashlin Iser}
-\subtitle{\insertauthor}
-%\institute{Algorithm Engineering (Prof. Peter Sanders)\\Institute of Theoretical Informatics\\KIT Department of Informatics}
-\institute{Algorithm~Engineering $\cdot$ Institute~of~Theoretical~Informatics}
+\groupname{Algorithm Engineering}
+\grouplogo{ae}
+\selectlanguage{english}
+\date{July 2022}
 
-\TitleImage[width=\titleimagewd]{scratch}
+\titleimage{scratch}
 
 \begin{document}
 
-\begin{frame}{asdf}
+\begin{frame}[title white horizontal]
 \maketitle
 \end{frame}
 
