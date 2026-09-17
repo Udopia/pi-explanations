@@ -62,7 +62,6 @@ class SolbertApiTest(unittest.TestCase):
         )
 
         encoder = RandomForestEncoder(RandomForestWrapper(classifier, lhs, rhs))
-        self.addCleanup(encoder.pool.terminate)
 
         self.assertGreater(len(encoder.clauses), 0)
 
@@ -102,7 +101,6 @@ class SolbertApiTest(unittest.TestCase):
             wrapper.feature_values(0), sorted(set(wrapper.feature_values(0)))
         )
         explainer = RandomForestExplainer("", None, wrapper)
-        self.addCleanup(explainer.encoder.pool.terminate)
         self.assertEqual(explainer.implicants, {})
 
         sample = [-1.0]

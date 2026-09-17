@@ -24,7 +24,6 @@ class RandomForestEncoder:
 
     def __init__(self, forest: RandomForestWrapper):
         self.rfw = forest
-        self.pool = None
         self.vprod = VariableProducer()
         # node variables:
         self.vnodestrue = []
@@ -63,11 +62,6 @@ class RandomForestEncoder:
         self.comb = [ [ ] for _ in range(self.rfw.n_classes()) ] 
         self.enumerate_valid_combinations()
         print("Valid Combinations: {}".format(sum(len(valid_combs) for valid_combs in self.comb)))
-        self.pool = multiprocessing.Pool(processes=5)
-
-    def __del__(self):
-        if self.pool is not None:
-            self.pool.terminate()
 
 
     def new_var(self):
@@ -134,17 +128,18 @@ class RandomForestEncoder:
         ]
 
 
-    def explain_parallel(self):
-        results = list()
-        for class_id in range(self.rfw.n_classes()):
-            target = self.encode_target_class(class_id)
-            res = self.pool.apply_async(compute_prime_implicants, (self.clauses + target, self.vintervall))
-            results.append(res)
-        implicants = dict()
-        for class_id in range(self.rfw.n_classes()):
-            cat = self.rfw.class_name(class_id)
-            implicants[cat] = results[class_id].get()
-            implicants[cat].sort(key=len)
+    def explain_parallel(self, processes=5):
+        with multiprocessing.Pool(processes=processes) as pool:
+            results = list()
+            for class_id in range(self.rfw.n_classes()):
+                target = self.encode_target_class(class_id)
+                res = pool.apply_async(compute_prime_implicants, (self.clauses + target, self.vintervall))
+                results.append(res)
+            implicants = dict()
+            for class_id in range(self.rfw.n_classes()):
+                cat = self.rfw.class_name(class_id)
+                implicants[cat] = results[class_id].get()
+                implicants[cat].sort(key=len)
         return implicants
 
 
@@ -169,16 +164,17 @@ class RandomForestEncoder:
         return moci.get_primp()
 
 
-    def explain_incremental_parallel(self):
-        results = list()
-        for class_id in range(self.rfw.n_classes()):
-            res = self.pool.apply_async(explain_comb, (self.clauses, self.vintervall, self.comb[class_id]))
-            results.append(res)
-        implicants = dict()
-        for class_id in range(self.rfw.n_classes()):
-            cat = self.rfw.class_name(class_id)
-            implicants[cat] = results[class_id].get()
-            implicants[cat].sort(key=len)
+    def explain_incremental_parallel(self, processes=5):
+        with multiprocessing.Pool(processes=processes) as pool:
+            results = list()
+            for class_id in range(self.rfw.n_classes()):
+                res = pool.apply_async(explain_comb, (self.clauses, self.vintervall, self.comb[class_id]))
+                results.append(res)
+            implicants = dict()
+            for class_id in range(self.rfw.n_classes()):
+                cat = self.rfw.class_name(class_id)
+                implicants[cat] = results[class_id].get()
+                implicants[cat].sort(key=len)
         return implicants
 
 
@@ -210,7 +206,7 @@ class RandomForestEncoder:
                     query.append("{} {} {}".format(feat, ">" if m0 else "<=", form))
             if prev != ncases:
                 nfeats = nfeats + 1
-        result = { "features": nfeats, "cases": ncases }
+        result: dict[str, int | str] = { "features": nfeats, "cases": ncases }
         if len(query) > 10:
             split = int(len(query)/2)
             query1 = " and ".join(query[:split])
