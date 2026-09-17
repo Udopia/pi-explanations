@@ -36,6 +36,7 @@ class RandomForestEncoder:
 
     def __init__(self, forest: RandomForestWrapper):
         self.rfw = forest
+        self.pool = None
         self.vprod = VariableProducer()
         # node variables:
         self.vnodestrue = []
@@ -58,12 +59,12 @@ class RandomForestEncoder:
         for feat_id in range(self.rfw.n_features()):
             self.vdeactivateright.append([ self.new_var() for _ in self.rfw.feature_values(feat_id) ])
         # sample variables:
-        self.samplevars = []
-        df = self.rfw.lhs
-        print(df)
-        leaf_ids = self.rfw.clf.apply(df.to_numpy())
-        for index, row in enumerate(leaf_ids):
-            print(index, list(row))
+        # self.samplevars = []
+        # df = self.rfw.lhs
+        # print(df)
+        # leaf_ids = self.rfw.clf.apply(df.to_numpy())
+        # for index, row in enumerate(leaf_ids):
+        #     print(index, list(row))
         # base encoding
         self.clauses = self.encode()
         total_comb = 1
@@ -77,7 +78,8 @@ class RandomForestEncoder:
         self.pool = multiprocessing.Pool(processes=5)
 
     def __del__(self):
-        self.pool.terminate()
+        if self.pool is not None:
+            self.pool.terminate()
 
 
     def new_var(self):

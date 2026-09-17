@@ -1,6 +1,11 @@
 import unittest
 
+import numpy as np
+import polars as pl
+from sklearn.ensemble import RandomForestClassifier
+
 import solbert
+from solbert.forest import RandomForestEncoder, RandomForestWrapper
 
 
 class SolbertApiTest(unittest.TestCase):
@@ -40,6 +45,20 @@ class SolbertApiTest(unittest.TestCase):
             RandomForestWrapper,
         ):
             self.assertTrue(callable(exported_class))
+
+    def test_random_forest_encoder_ignores_raw_samples(self):
+        lhs = pl.DataFrame({"feature": ["empty", "1", "2", "3"]})
+        rhs = pl.Series("target", ["a", "a", "b", "b"]).cast(pl.Categorical)
+        classifier = RandomForestClassifier(n_estimators=2, random_state=0)
+        classifier.fit(
+            np.array([[-1.0], [1.0], [2.0], [3.0]]),
+            rhs.to_physical().to_numpy(),
+        )
+
+        encoder = RandomForestEncoder(RandomForestWrapper(classifier, lhs, rhs))
+        self.addCleanup(encoder.pool.terminate)
+
+        self.assertGreater(len(encoder.clauses), 0)
 
 
 if __name__ == "__main__":
