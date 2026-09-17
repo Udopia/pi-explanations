@@ -3,7 +3,7 @@
 [![Build-Test](https://github.com/Udopia/solbert/actions/workflows/build_test.yml/badge.svg?branch=main)](https://github.com/Udopia/solbert/actions/workflows/build_test.yml)
 [![PyPI](https://img.shields.io/pypi/v/solbert.svg)](https://pypi.org/project/solbert/)
 [![Python](https://img.shields.io/pypi/pyversions/solbert.svg)](https://pypi.org/project/solbert/)
-[![License](https://img.shields.io/pypi/l/solbert.svg)](https://github.com/Udopia/solbert/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/Udopia/solbert.svg)](https://github.com/Udopia/solbert/blob/main/LICENSE)
 
 Solbert computes **prime-implicant explanations** for scikit-learn decision trees and random forests.
 These explanations are also known as *abductive explanations* or *sufficient reasons*: inclusion-minimal sets of feature conditions that are enough to force a classification result.
