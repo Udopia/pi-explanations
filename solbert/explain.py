@@ -85,7 +85,7 @@ class InterestingExplainer(Explainer):
 
     def __init__(self, model_getter, api: GBD):
         query = "minisat1m != emtpy"
-        source = api.get_features("base_db") #+ api.get_features("gate_db")
+        source = api.get_features("base") #+ api.get_features("gate")
         df = api.query(query, resolve=source + ["minisat1m"])
         Explainer.__init__(self, model_getter, api, df, "minisat1m", query)
 
@@ -94,7 +94,7 @@ class FamilyExplainer(Explainer):
 
     def __init__(self, model_getter, api: GBD):
         query = "track like %20% and family != unknown and family != agile and family unlike %random%"# and family like b%"
-        source = api.get_features("base_db") #+ api.get_features("gate_db")
+        source = api.get_features("base") #+ api.get_features("gate")
         df = api.query(query, resolve=source + ["family"])
         Explainer.__init__(self, model_getter, api, df, "family", query)
 
@@ -106,7 +106,7 @@ class PortfolioExplainer(Explainer):
             f"({solver} != timeout and {solver} != memout)" for solver in solvers
         )
         query = f"track = main_2020 and ({notout})"
-        source = api.get_features("base_db") + api.get_features("gate_db")
+        source = api.get_features("base") + api.get_features("gate")
         df = api.query(query, resolve=source + solvers)
         solver_values = [
             pl.col(solver)
