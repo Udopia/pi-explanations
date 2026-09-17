@@ -83,6 +83,9 @@ add_custom_command(TARGET _native POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${PROJECT_SOURCE_DIR}/solbert"
             "${CMAKE_BINARY_DIR}/solbert"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:_native>"
+            "${PROJECT_SOURCE_DIR}/solbert/$<TARGET_FILE_NAME:_native>"
 )
 
 install(TARGETS _native

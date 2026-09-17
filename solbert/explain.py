@@ -24,7 +24,6 @@ from sklearn.model_selection import train_test_split
 from solbert.forest import RandomForestExplainer, RandomForestWrapper
 from solbert.tree import DecisionTreeExplainer, DecisionTreeWrapper
 
-
 REPLACEMENTS = {
     "timeout": np.inf,
     "memout": np.inf,

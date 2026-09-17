@@ -17,12 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from argparse import ArgumentParser
-
 from gbd_core.api import GBD
 from sklearn import ensemble, tree
-
 from explain import FamilyExplainer, InterestingExplainer, PortfolioExplainer
-
 
 def explain_portfolio(model_getter, api: GBD):
     ex = PortfolioExplainer(model_getter, api, [ "kissat_unsat", "relaxed_newtech" ])
@@ -44,11 +41,11 @@ def explain_interesting(model_getter, api: GBD):
 
 def main():
     databases = [
-        "/home/iser/git/gbd-data/meta.db",
-        "/home/iser/git/gbd-data/base.db",
-        "/home/iser/git/gbd-data/gate.db",
-        "/home/iser/git/gbd-data/sc2020.db",
-        "/home/iser/git/gbd-data/minisat.db"
+        "/home/iser/git/gbd/gbd-data/cnf/meta.db",
+        "/home/iser/git/gbd/gbd-data/cnf/base.db",
+        "/home/iser/git/gbd/gbd-data/cnf/gate.db",
+        # "/home/iser/git/gbd/gbd-data/sc2020.db",
+        # "/home/iser/git/gbd/gbd-data/minisat.db"
     ]
 
     parser = ArgumentParser(description='Solbert')

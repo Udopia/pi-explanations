@@ -54,6 +54,17 @@ CMAKE_ARGS="-DSOLBERT_CADICAL_LIBRARY=/path/to/libcadical.a" \
   python -m pip install ./solbert
 ```
 
+To build and run directly from the checkout without installing:
+
+```bash
+cmake -S solbert -B solbert/build
+cmake --build solbert/build --target _native
+python solbert/eval.py 1
+```
+
+CMake builds copy the native extension into the source package. The generated
+extension is ignored by Git.
+
 Run the package tests with:
 
 ```bash
