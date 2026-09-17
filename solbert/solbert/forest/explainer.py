@@ -60,6 +60,15 @@ class RandomForestExplainer:
             eprint("Number of prime implicants: {}".format(len(self.implicants[cat])))
         #self.plot(cat_leafs, cat_imps)
 
+    def explain_prediction(self, sample):
+        prediction = self.wrapper.clf.predict([sample])[0]
+        class_id = list(self.wrapper.clf.classes_).index(prediction)
+        category = self.wrapper.class_name(class_id)
+        reasons = self.encoder.explain_prediction(
+            sample, self.implicants[category]
+        )
+        return category, reasons
+
 
     def explain(self, cat):
         imps = self.implicants[cat]

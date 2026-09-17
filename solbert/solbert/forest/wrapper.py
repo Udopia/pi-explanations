@@ -20,9 +20,9 @@ class RandomForestWrapper:
         for tree in self.trees:
             for feat, splits in enumerate(tree.feature_splits):
                 self.feature_splits[feat].extend(splits)
-        for values in self.feature_splits:
-            values = sorted(set(values))
-            #print(len(values))
+        self.feature_splits = [
+            sorted(set(values)) for values in self.feature_splits
+        ]
 
     def leaf_nodes(self, class_name):
         nodes = []

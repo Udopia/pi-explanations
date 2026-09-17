@@ -107,6 +107,32 @@ class RandomForestEncoder:
             implicants[cat].sort(key=len)
         return implicants
 
+    def sample_literals(self, sample):
+        if len(sample) != self.rfw.n_features():
+            raise ValueError(
+                f"Expected {self.rfw.n_features()} features, got {len(sample)}"
+            )
+
+        literals = set()
+        for feature_id, value in enumerate(sample):
+            interval_id = np.searchsorted(
+                self.rfw.feature_values(feature_id), value, side="left"
+            )
+            literals.update(
+                -variable
+                for index, variable in enumerate(self.vintervals[feature_id])
+                if index != interval_id
+            )
+        return literals
+
+    def explain_prediction(self, sample, class_implicants):
+        literals = self.sample_literals(sample)
+        return [
+            implicant
+            for implicant in class_implicants
+            if set(implicant).issubset(literals)
+        ]
+
 
     def explain_parallel(self):
         results = list()
