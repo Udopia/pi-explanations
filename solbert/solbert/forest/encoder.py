@@ -149,11 +149,15 @@ class RandomForestEncoder:
 
 
     def explain_incremental(self):
-        implicants = dict()
-        for class_id in range(self.rfw.n_classes()):
-            cat = self.rfw.class_name(class_id)
-            implicants[cat] = self.explain_class_incremental(class_id)
-            implicants[cat].sort(key=len)
+        return {
+            category: self.explain_class(category)
+            for category in self.rfw.class_names
+        }
+
+    def explain_class(self, category):
+        class_id = self.rfw.class_id(category)
+        implicants = self.explain_class_incremental(class_id)
+        implicants.sort(key=len)
         return implicants
 
     

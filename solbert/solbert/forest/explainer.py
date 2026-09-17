@@ -21,31 +21,15 @@ class RandomForestExplainer:
         self.wrapper = wrapper
         self.encoder = RandomForestEncoder(wrapper)
         self.cats = self.wrapper.class_names
-        if 0 == 1:
-            # compute pis sequential
+        self.implicants = {}
+
+    def _implicants_for(self, category):
+        if category not in self.implicants:
             start = time.time()
-            self.implicants = self.encoder.explain()
-            self.print_implicants()
+            self.implicants[category] = self.encoder.explain_class(category)
             end = time.time()
             eprint("\n -> Seconds to explain: {}\n".format(round(end - start)))
-            # compute pis parallel
-            start = time.time()
-            self.implicants = self.encoder.explain_parallel()
-            self.print_implicants()
-            end = time.time()
-            eprint("\n -> Seconds to explain: {}\n".format(round(end - start)))
-            # compute pis incremental
-            start = time.time()
-            self.implicants = self.encoder.explain_incremental()
-            self.print_implicants()
-            end = time.time()
-            eprint("\n -> Seconds to explain: {}\n".format(round(end - start)))
-        # compute pis incremental and parallel
-        start = time.time()
-        self.implicants = self.encoder.explain_incremental_parallel()
-        self.print_implicants()
-        end = time.time()
-        eprint("\n -> Seconds to explain: {}\n".format(round(end - start)))
+        return self.implicants[category]
 
 
     def print_implicants(self):
@@ -57,7 +41,7 @@ class RandomForestExplainer:
             #(leafs, imps) = self.explain(cat)
             #cat_leafs.append(leafs)
             #cat_imps.append(imps)
-            eprint("Number of prime implicants: {}".format(len(self.implicants[cat])))
+            eprint("Number of prime implicants: {}".format(len(self._implicants_for(cat))))
         #self.plot(cat_leafs, cat_imps)
 
     def explain_prediction(self, sample):
@@ -65,13 +49,13 @@ class RandomForestExplainer:
         class_id = list(self.wrapper.clf.classes_).index(prediction)
         category = self.wrapper.class_name(class_id)
         reasons = self.encoder.explain_prediction(
-            sample, self.implicants[category]
+            sample, self._implicants_for(category)
         )
         return category, reasons
 
 
     def explain(self, cat):
-        imps = self.implicants[cat]
+        imps = self._implicants_for(cat)
         I = []
         for imp in imps:
             explanation = self.encoder.decode(imp)

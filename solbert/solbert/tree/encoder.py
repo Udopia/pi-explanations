@@ -68,11 +68,14 @@ class DecisionTreeEncoder:
 
 
     def explain(self):
-        implicants = dict()
-        for cat in self.dtw.class_names:
-            target = self.encode_target_classes([cat])
-            implicants[cat] = compute_prime_implicants(self.clauses + target, self.vintervall)
-            implicants[cat].sort(key=len)
+        return {cat: self.explain_class(cat) for cat in self.dtw.class_names}
+
+    def explain_class(self, category):
+        target = self.encode_target_classes([category])
+        implicants = compute_prime_implicants(
+            self.clauses + target, self.vintervall
+        )
+        implicants.sort(key=len)
         return implicants
 
     def sample_literals(self, sample):

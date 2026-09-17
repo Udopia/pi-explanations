@@ -19,7 +19,12 @@ class DecisionTreeExplainer:
         self.wrapper = wrapper
         self.encoder = DecisionTreeEncoder(wrapper)
         self.cats = self.wrapper.class_names
-        self.implicants = self.encoder.explain()
+        self.implicants = {}
+
+    def _implicants_for(self, category):
+        if category not in self.implicants:
+            self.implicants[category] = self.encoder.explain_class(category)
+        return self.implicants[category]
 
 
     def print_implicants(self):
@@ -36,13 +41,13 @@ class DecisionTreeExplainer:
         class_id = list(self.wrapper.clf.classes_).index(prediction)
         category = self.wrapper.class_name(class_id)
         reasons = self.encoder.explain_prediction(
-            sample, self.implicants[category]
+            sample, self._implicants_for(category)
         )
         return category, reasons
 
 
     def explain(self, cat):
-        imps = self.implicants[cat]
+        imps = self._implicants_for(cat)
         eprint("-" * 42)
         eprint("Explaining category: {}".format(cat))
         leafs = self.wrapper.leaf_nodes(cat)

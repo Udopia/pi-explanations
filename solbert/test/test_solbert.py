@@ -77,13 +77,19 @@ class SolbertApiTest(unittest.TestCase):
         explainer = DecisionTreeExplainer(
             "", None, DecisionTreeWrapper(classifier, lhs, rhs)
         )
+        self.assertEqual(explainer.implicants, {})
 
         category, reasons = explainer.explain_prediction([1.0, -1.0])
 
         self.assertEqual(category, "positive")
+        self.assertEqual(set(explainer.implicants), {category})
+        self.assertGreater(len(reasons), 0)
         self.assertLess(len(reasons), len(explainer.implicants[category]))
         sample_literals = explainer.encoder.sample_literals([1.0, -1.0])
         self.assertTrue(all(set(reason).issubset(sample_literals) for reason in reasons))
+        cached = explainer.implicants[category]
+        explainer.explain_prediction([1.0, -1.0])
+        self.assertIs(explainer.implicants[category], cached)
 
     def test_random_forest_explains_prediction_from_cached_implicants(self):
         samples = np.array([[-1.0], [1.0], [2.0], [3.0]])
@@ -92,30 +98,23 @@ class SolbertApiTest(unittest.TestCase):
         classifier = RandomForestClassifier(n_estimators=2, random_state=0)
         classifier.fit(samples, rhs.to_physical().to_numpy())
         wrapper = RandomForestWrapper(classifier, lhs, rhs)
-        encoder = RandomForestEncoder(wrapper)
-        self.addCleanup(encoder.pool.terminate)
         self.assertEqual(
             wrapper.feature_values(0), sorted(set(wrapper.feature_values(0)))
         )
+        explainer = RandomForestExplainer("", None, wrapper)
+        self.addCleanup(explainer.encoder.pool.terminate)
+        self.assertEqual(explainer.implicants, {})
 
         sample = [-1.0]
-        sample_literals = encoder.sample_literals(sample)
-        actual_interval = np.searchsorted(
-            wrapper.feature_values(0), sample[0], side="left"
-        )
-        incompatible = [-encoder.vintervals[0][actual_interval]]
-        compatible = sorted(sample_literals)
-        prediction = classifier.predict([sample])[0]
-        category = wrapper.class_name(list(classifier.classes_).index(prediction))
-        explainer = RandomForestExplainer.__new__(RandomForestExplainer)
-        explainer.wrapper = wrapper
-        explainer.encoder = encoder
-        explainer.implicants = {category: [compatible, incompatible]}
+        category, reasons = explainer.explain_prediction(sample)
 
-        predicted_category, reasons = explainer.explain_prediction(sample)
-
-        self.assertEqual(predicted_category, category)
-        self.assertEqual(reasons, [compatible])
+        self.assertEqual(set(explainer.implicants), {category})
+        self.assertGreater(len(reasons), 0)
+        sample_literals = explainer.encoder.sample_literals(sample)
+        self.assertTrue(all(set(reason).issubset(sample_literals) for reason in reasons))
+        cached = explainer.implicants[category]
+        explainer.explain_prediction(sample)
+        self.assertIs(explainer.implicants[category], cached)
 
 
 if __name__ == "__main__":
