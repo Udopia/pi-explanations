@@ -30,10 +30,7 @@ def explain_interesting(model_getter, api: GBD):
 def main():
     databases = [
         "/home/iser/git/gbd/gbd-data/cnf/meta.db",
-        "/home/iser/git/gbd/gbd-data/cnf/base.db",
-        "/home/iser/git/gbd/gbd-data/cnf/gate.db",
-        # "/home/iser/git/gbd/gbd-data/sc2020.db",
-        # "/home/iser/git/gbd/gbd-data/minisat.db"
+        "/home/iser/git/gbd/gbd-data/cnf/base.db"
     ]
 
     parser = ArgumentParser(description='Solbert')

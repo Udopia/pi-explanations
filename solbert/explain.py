@@ -64,7 +64,7 @@ class Explainer:
         elif isinstance(model, ensemble.RandomForestClassifier):
             wrapper = RandomForestWrapper(model, self.lhs, self.rhs)
             explainer = RandomForestExplainer(self.query, self.api, wrapper)
-            #explainer.print_implicants()
+            explainer.print_implicants()
         else:
             eprint(f"Cannot explain models of type {type(model)}")
 
@@ -73,7 +73,7 @@ class InterestingExplainer(Explainer):
 
     def __init__(self, model_getter, api: GBD):
         query = "minisat1m != emtpy"
-        source = api.get_features("base") #+ api.get_features("gate")
+        source = api.get_features("base")
         df = api.query(query, resolve=source + ["minisat1m"])
         Explainer.__init__(self, model_getter, api, df, "minisat1m", query)
 
@@ -82,7 +82,7 @@ class FamilyExplainer(Explainer):
 
     def __init__(self, model_getter, api: GBD):
         query = "track like %20% and family != unknown and family != agile and family unlike %random%"# and family like b%"
-        source = api.get_features("base") #+ api.get_features("gate")
+        source = api.get_features("base")
         df = api.query(query, resolve=source + ["family"])
         Explainer.__init__(self, model_getter, api, df, "family", query)
 
@@ -94,7 +94,7 @@ class PortfolioExplainer(Explainer):
             f"({solver} != timeout and {solver} != memout)" for solver in solvers
         )
         query = f"track = main_2020 and ({notout})"
-        source = api.get_features("base") + api.get_features("gate")
+        source = api.get_features("base")
         df = api.query(query, resolve=source + solvers)
         solver_values = [
             pl.col(solver)

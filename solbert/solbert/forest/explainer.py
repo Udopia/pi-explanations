@@ -83,8 +83,8 @@ class RandomForestExplainer:
             imp_x = range(len(I))
             imp_y = [ imp[1] for imp in I ]
             fig, ax = pyplot.subplots()
-            ax.set_xlim([0, max(imp_x) + 1])
-            ax.set_ylim([0, max(imp_y) + 1])
+            ax.set_xlim((0, max(imp_x, default=0) + 1))
+            ax.set_ylim((0, max(imp_y, default=0) + 1))
             ax.set_ylabel("Number of Covered Training Samples")
             ax.set_xlabel("Prime Implicant")        
             pyplot.title(self.cats[i].upper())
